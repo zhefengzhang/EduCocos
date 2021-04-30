@@ -1,0 +1,21 @@
+{
+    "version": "1.0",
+    "children": [
+        {
+            "id": "57494447-ea4d-4079-b734-abfd75a31932",
+            "name": "学科一",
+            "children": [
+                {
+                    "id": "d0783ca5-f141-437f-94fd-4ed0cd6ee74e",
+                    "name": "课程一",
+                    "nodeType": "__edu_lesson",
+                    "folder": "fc3c0551-fbc9-4a53-a94b-5608deebb3f3",
+                    "parentId": null,
+                    "pages": [],
+                    "asset": ""
+                }
+            ],
+            "nodeType": "__edu_collection"
+        }
+    ]
+}
