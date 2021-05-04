@@ -7,7 +7,7 @@ import EduElementAbstract from "EduElementAbstract";
 const {ccclass, property, menu} = cc._decorator;
 
 @ccclass
-@menu("教育课件UI组件/普通文本")
+@menu("教育课件UI组件/倒计时分钟文本")
 export default class Label extends EduElementAbstract {
 
     @property(cc.Label)
@@ -26,6 +26,25 @@ export default class Label extends EduElementAbstract {
         if (this.countDownMinuteLab) {
             if (Number(value) > 59) value = "59";
             this.countDownMinuteLab.string = value;
+        }
+    }
+
+    @property(cc.Label)
+    countDownSecondLab: cc.Label = null;
+
+    @property({type:cc.String, multiline:true, tooltip: '倒计时秒钟'})
+    @eduProperty({displayName: '倒计时秒钟'})
+    get countDownSecond() {
+        if (!this.countDownSecondLab) {
+            return "00";
+        }
+        return this.countDownSecondLab.string;
+    }
+
+    set countDownSecond(value) {
+        if (this.countDownSecondLab) {
+            if (Number(value) > 59) value = "59";
+            this.countDownSecondLab.string = value;
         }
     }
 }

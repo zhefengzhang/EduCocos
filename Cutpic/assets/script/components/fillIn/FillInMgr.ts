@@ -11,9 +11,9 @@ const {ccclass, property, menu} = cc._decorator;
 
 @ccclass
 @menu("教育课件题型组件/选择题")
-export default class Choice extends EduElementAbstract {
+export default class FillIn extends EduElementAbstract {
 
-    public static choiceMgr: Choice = null;
+    public static fillInMgr: FillIn = null;
 
     //#region 问题
     @property(cc.Label)
@@ -39,39 +39,36 @@ export default class Choice extends EduElementAbstract {
 
     //#region 答案
     @property
-    _answerCount: number = 0;
-    @property({type: cc.Integer, displayName: '答案数量', min: 0, step: 1})
-    @eduProperty({ displayName: '答案数量' })
-    get eduAnswerCount() {
-        return this._answerCount;
+    _stoneCount: number = 0;
+    @property({type: cc.Integer, displayName: '石头数量', min: 0, step: 1})
+    @eduProperty({ displayName: '石头数量' })
+    get stoneCount() {
+        return this._stoneCount;
     }
-    set eduAnswerCount(v) {
-        this._answerCount = v;
-        if (this.answerPage) {
-            Utils.loadAnyNumPrefab(v, this.answerPage, this.answerItem, (answerItem: cc.Node)=>{
-                var _comp = answerItem.getComponent("ChoiceAnswerItem");
-                if (_comp.initView) _comp.initView();
-            });
+    set stoneCount(v) {
+        this._stoneCount = v;
+        if (this.stoneBox) {
+            Utils.loadAnyNumPrefab(v, this.stoneBox, this.stoneItem);
         }
     }
 
     @property(cc.Node)
-    answerPage: cc.Node = null;
+    stoneBox: cc.Node = null;
 
     @property(cc.Prefab)
-    answerItem: cc.Prefab = null;
+    stoneItem: cc.Prefab = null;
 
     //@ts-ignore
     @property
-    _correctAnswerIndex: number = 0;
-    @property({type: cc.Integer, displayName: "正确答案的序号", min: 0, step: 1})
-    @eduProperty({ displayName: "正确答案的序号" })
-    get eduCorrectAnswerIndex() {
-        return this._correctAnswerIndex;
+    _correctAnswerNumber: number = 0;
+    @property({type: cc.Integer, displayName: "正确答案的数字", min: 0, step: 1})
+    @eduProperty({ displayName: "正确答案的数字" })
+    get correctAnswerNumber() {
+        return this._correctAnswerNumber;
     }
 
-    set eduCorrectAnswerIndex(value) {
-        this._correctAnswerIndex = value > this.answerPage.childrenCount ? this.answerPage.childrenCount : value;
+    set correctAnswerNumber(value) {
+        this._correctAnswerNumber = value > this.stoneBox.childrenCount ? this.stoneBox.childrenCount : value;
     }
     //#endregion
 
@@ -100,7 +97,7 @@ export default class Choice extends EduElementAbstract {
     //#endregion
     
     onLoad() {
-        Choice.choiceMgr = this;
+        FillIn.fillInMgr = this;
     }
 
     /**
