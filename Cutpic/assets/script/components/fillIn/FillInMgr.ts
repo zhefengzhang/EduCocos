@@ -10,7 +10,7 @@ import Utils from "../Utils";
 const {ccclass, property, menu} = cc._decorator;
 
 @ccclass
-@menu("教育课件题型组件/选择题")
+@menu("教育课件题型组件/填空题")
 export default class FillIn extends EduElementAbstract {
 
     public static fillInMgr: FillIn = null;

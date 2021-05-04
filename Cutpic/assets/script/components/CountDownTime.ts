@@ -7,7 +7,7 @@ import EduElementAbstract from "EduElementAbstract";
 const {ccclass, property, menu} = cc._decorator;
 
 @ccclass
-@menu("教育课件UI组件/倒计时分钟文本")
+@menu("教育课件UI组件/倒计时文本")
 export default class Label extends EduElementAbstract {
 
     @property(cc.Label)
