@@ -2,14 +2,14 @@
     "version": "1.0",
     "children": [
         {
-            "id": "57494447-ea4d-4079-b734-abfd75a31932",
+            "id": "a0a3dce6-2d18-4b96-8fae-78d8d16baf3f",
             "name": "学科一",
             "children": [
                 {
-                    "id": "d0783ca5-f141-437f-94fd-4ed0cd6ee74e",
+                    "id": "6b6c7eb3-a18a-4994-931c-8f28e295a146",
                     "name": "课程一",
                     "nodeType": "__edu_lesson",
-                    "folder": "fc3c0551-fbc9-4a53-a94b-5608deebb3f3",
+                    "folder": "a8fcb4fa-192e-4316-b7b3-542f7a1392e6",
                     "parentId": null,
                     "pages": [],
                     "asset": ""
