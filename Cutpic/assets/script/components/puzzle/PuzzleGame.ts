@@ -324,6 +324,8 @@ export default class PuzzleGame extends EduElementAbstract {
     //确定位置不移动，设置图片位置
     confirmPos(node, pos) {
         let self = this;
+        console.log(pos.x, pos.y, ">>>>confirmPos", this._posData)
+
         for (let index = 0; index < this._posData.length; index++) {
             const element = this._posData[index];
             let boxCom = self.container.children[index].getComponent('BoxState');

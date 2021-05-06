@@ -15,6 +15,7 @@ export default class NewClass extends cc.Component {
     _layoutIndex = 0;
     name = "";
     data = null;
+    parentNode = null;
     onEnable() {
         this.regisTouchEvent();
 
@@ -47,6 +48,9 @@ export default class NewClass extends cc.Component {
 
     }
 
+    start(){
+        this.parentNode = this.node.parent.parent.parent.parent;
+    }
     _onTouchMove(event) {
         if (!this._canMove) {
             return;
@@ -55,10 +59,9 @@ export default class NewClass extends cc.Component {
         let pos = this.node.parent.convertToNodeSpaceAR(localPos);
         console.log(pos.x, pos.y, 'e:', localPos.x, localPos.y);
         this.node.setPosition(pos.x, pos.y);
-        let parent = this.node.parent.parent.parent.parent;
-        let gameCom = parent.getComponent('PuzzleGame');
+        let gameCom = this.parentNode.getComponent('PuzzleGame');
         if (gameCom) {
-            parent.getComponent('PuzzleGame').checkPos(this.node, localPos);
+            this.parentNode.getComponent('PuzzleGame').checkPos(this.node, localPos);
 
         }
     }
@@ -73,9 +76,10 @@ export default class NewClass extends cc.Component {
             
         }
         let localPos = event.getLocation();
-        let gameCom = this.node.parent.parent.getComponent('Game');
+        
+        let gameCom = this.parentNode.getComponent('PuzzleGame');
         if (gameCom) {
-            this.node.parent.parent.getComponent('Game').confirmPos(this.node, localPos);
+            this.parentNode.getComponent('PuzzleGame').confirmPos(this.node, localPos);
 
         }
     }
