@@ -1,15 +1,39 @@
-// Learn TypeScript:
-//  - https://docs.cocos.com/creator/manual/en/scripting/typescript.html
-// Learn Attribute:
-//  - https://docs.cocos.com/creator/manual/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
-const {ccclass, property} = cc._decorator;
+declare var cc: any;
+//@ts-ignore
+import { eduProperty, syncNum, i18n } from "education";
+//@ts-ignore
+import EduElementAbstract from "EduElementAbstract";
 
+import Utils from "../Utils";
+
+//@ts-ignore
+const {ccclass, property, menu} = cc._decorator;
 @ccclass
-export default class NewClass extends cc.Component {
+export default class AnswerItem extends EduElementAbstract {
+    ConnectGameMgr: Object = null;
 
-    num = 0;
+    _num = 0;
+    _clickStatus = false;
+    _status = false;
 
+    // @property
+    // _answerNum = 0;
+    // @property({type: cc.Integer, displayName: '正确答案', min: 0, step: 1})
+    // @eduProperty({ displayName: '正确答案' })
+    // get eduAnsweCount() {
+    //     return this._answerNum;
+    // }
+    // set eduAnsweCount(v) {
+    //     this._answerNum = v;
+      
+    // }
+    clickAnswerItem() {
+        //@ts-ignore
+        // let pos =this.node.convertToWorldSpaceAR(cc.v2());
+        // if (this._startPos != null) {
+        //     this.drawLine(this._startPos, this._endPos);
+
+        // }
+    }
 }

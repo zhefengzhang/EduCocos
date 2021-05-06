@@ -70,4 +70,5 @@ export default class Utils{
         if (totalSecond < 0) return 0;
         return ((totalSecond % 3600) % 60);
     }
+
 }
