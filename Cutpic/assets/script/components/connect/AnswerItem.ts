@@ -8,15 +8,22 @@ import EduElementAbstract from "EduElementAbstract";
 import Utils from "../Utils";
 
 //@ts-ignore
-const {ccclass, property, menu} = cc._decorator;
+const { ccclass, property, menu } = cc._decorator;
 @ccclass
 export default class AnswerItem extends EduElementAbstract {
-    ConnectGameMgr: Object = null;
 
+    @property({ type: cc.Integer, displayName: "答案序号" })
+    @eduProperty({ displayName: "答案序号" })
+    get answerItemIndex() {
+        //@ts-ignore
+        return this.node.parent.children.indexOf(this.node) + 1;
+    }
     _num = 0;
     _clickStatus = false;
     _status = false;
 
+    @property(cc.Node)
+    pic: cc.Node = null;
     // @property
     // _answerNum = 0;
     // @property({type: cc.Integer, displayName: '正确答案', min: 0, step: 1})
@@ -26,14 +33,24 @@ export default class AnswerItem extends EduElementAbstract {
     // }
     // set eduAnsweCount(v) {
     //     this._answerNum = v;
-      
+
     // }
     clickAnswerItem() {
+        if(this._status){
+            return;
+        }
+       
         //@ts-ignore
-        // let pos =this.node.convertToWorldSpaceAR(cc.v2());
-        // if (this._startPos != null) {
-        //     this.drawLine(this._startPos, this._endPos);
+        let parent = this.node.parent.parent.parent;
+        let com = parent.getComponent('ConnectGame');
+        //@ts-ignore
+        let index = this.node.parent.children.indexOf(this.node);
+        //@ts-ignore
+        com.clickEnd(this.node, index);
+    }
 
-        // }
+    getNum(){
+        //@ts-ignore
+        return this.node.parent.children.indexOf(this.node);
     }
 }

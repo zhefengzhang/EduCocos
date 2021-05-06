@@ -49,24 +49,28 @@ export default class ConnectGame extends EduElementAbstract {
     //#region 数据编辑
     @property//(cc.string)
     _leftData = '';
+    @property({ type: cc.string, displayName: '问题数据'})
     @eduProperty({ displayName: '问题数据' })
     get eduLeftData() {
         return this._leftData;
     }
     set eduLeftData(v) {
         this._leftData = v;
-
+        this.creatQuestion();
     }
     //#endregion
     //#region 数据编辑
     @property//(cc.string)
     _rightData = '';
+    @property({ type: cc.string, displayName: '答案数据'})
     @eduProperty({ displayName: '答案数据' })
     get eduRightData() {
         return this._rightData;
     }
     set eduRightData(v) {
         this._rightData = v;
+        this.creatAnswer();
+
     }
     //#region 答案数量
     @property
@@ -134,7 +138,8 @@ export default class ConnectGame extends EduElementAbstract {
     @property(cc.Prefab)
     lineNode: cc.Prefab = null;
 
-
+    @property(cc.SpriteFrame)
+    picArray: Array<cc.SpriteFrame> = [];
     //#endregion
     //#region 能否拖动
     //  @property
@@ -166,11 +171,13 @@ export default class ConnectGame extends EduElementAbstract {
         ConnectGame.ConnectGameMgr = this;
     }
     start() {
-        this.AnswerContent.getComponent(cc.Layout).enabled = true;
-        this.QuesContent.getComponent(cc.Layout).enabled = true;
-        this.setLayoutSpace();
-        this.creatQuestion();
-        this.creatAnswer();
+        // this.AnswerContent.getComponent(cc.Layout).enabled = true;
+        // this.QuesContent.getComponent(cc.Layout).enabled = true;
+        // this.setLayoutSpace();
+        // this.creatQuestion();
+        // this.creatAnswer();
+        this.getLeftData();
+        this.getRightData();
     }
 
     getLeftData(){
@@ -206,6 +213,7 @@ export default class ConnectGame extends EduElementAbstract {
         this.QuesContent.getComponent(cc.Layout).enabled = true;
         this.QuesContent.destroyAllChildren();
         this.getLeftData();
+        
         for (let index = 0; index < this._queNum; index++) {
             let node = cc.instantiate(this.Quesitem);
             this.QuesContent.addChild(node);
@@ -215,6 +223,8 @@ export default class ConnectGame extends EduElementAbstract {
             }
             com._num = index;
             com._answerNum = this._formLeftData[index];
+            let picNum = this.randomFunc(0,2);
+            node.getChildByName('Sprite').getComponent(cc.Sprite).spriteFrame = this.picArray[picNum];
             node.on('click', (event) => {
                 console.log(node.getComponent('QuestionItem')._num, '>>>QuestionItem.num', index)
 
@@ -228,6 +238,10 @@ export default class ConnectGame extends EduElementAbstract {
         })
     }
 
+    randomFunc(min,max){
+       return Math.floor(Math.random()*(max-min+1)+min);
+
+    }
     //暂时没使用到
     saveQuesData() {
         let leng = this.QuesContent.children.length;
@@ -280,11 +294,12 @@ export default class ConnectGame extends EduElementAbstract {
     }
 
     clickStart(node, index) {
-
+        this.changequeActive();
         let com = node.getComponent('QuestionItem');
         if (com._status) {
             return;
         }
+        node.getChildByName('pic').active = true;
         let pos = node.convertToWorldSpaceAR(cc.v2());
         this._startNum = index;
         let nodePos = this.LineContent.convertToNodeSpaceAR(pos);
@@ -304,6 +319,8 @@ export default class ConnectGame extends EduElementAbstract {
         if (com._status) {
             return;
         }
+        this.changeAnsActive();
+        node.getChildByName('pic').active = true;
         let pos = node.convertToWorldSpaceAR(cc.v2());
         this._endNum = index;
         let nodePos = this.LineContent.convertToNodeSpaceAR(pos);
@@ -314,6 +331,20 @@ export default class ConnectGame extends EduElementAbstract {
             this.drawLine(this._startPos, this._endPos);
         }
 
+    }
+    changequeActive(){
+        let children = this.QuesContent.children;
+        for (let index = 0; index < children.length; index++) {
+            const element = children[index];
+            element.getChildByName('pic').active = false;
+        }
+    }
+    changeAnsActive(){
+        let children = this.AnswerContent.children;
+        for (let index = 0; index < children.length; index++) {
+            const element = children[index];
+            element.getChildByName('pic').active = false;
+        }
     }
 
     drawLine(startPos, endPos) {
@@ -334,12 +365,16 @@ export default class ConnectGame extends EduElementAbstract {
 
         this.changeStatus();
     }
+
     getAnswerStatu() {
         let rightCom = this._rightNode.getComponent('AnswerItem');
         let leftCom = this._leftNode.getComponent('QuestionItem');
 
-        let rightNum = rightCom._num;
-        let leftNum = leftCom._num;
+        let rightNum = rightCom.getNum();
+        let leftNum = leftCom.getNum();
+        // console.log(rightNum ,leftNum);
+        // console.log(this._formRightData ,this._formLeftData,"####");
+        
         if (this._formLeftData[leftNum] === this._formRightData[rightNum]) {
             return true;
         } else {
