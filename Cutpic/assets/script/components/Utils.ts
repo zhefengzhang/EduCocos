@@ -71,4 +71,9 @@ export default class Utils{
         return ((totalSecond % 3600) % 60);
     }
 
+
+    public static randomFunc(min,max){
+        return Math.floor(Math.random()*(max-min+1)+min);
+ 
+     }
 }
