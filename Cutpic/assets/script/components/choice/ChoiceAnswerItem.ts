@@ -2,7 +2,9 @@ declare var cc: any;
 //@ts-ignore
 import { eduProperty, i18n } from "education";
 
-import Choice from "./ChoiceMgr";
+import Choice from "./ChoiceMgr"
+import GMgr from "../GameMgr";
+import GData from "../GameData";
 import Utils from "../Utils";
 //@ts-ignore
 import EduElementAbstract from "EduElementAbstract";
@@ -61,55 +63,28 @@ export default class NewClass extends EduElementAbstract {
     onButtonCLicked (event: TouchEvent) {
         if (Choice.choiceMgr._correctAnswerIndex === 0) return;
         //@ts-ignore
-        var parent = this.node.parent;
-        for (let i = 0; i < parent.childrenCount; i++) {
-            //@ts-ignore
-            var _comp = parent.children[i].getComponent("ChoiceAnswerItem");
-            if (_comp) {
-                _comp.result.node.opacity = 255;
-                
-                var answerResult = _comp.answerItemIndex === Choice.choiceMgr._correctAnswerIndex;
-                if (answerResult) {
-                    _comp.result.spriteFrame = this.correct;
-                } else {
-                    _comp.result.spriteFrame = this.wrong;
-                }
-            }
-        }
-        //@ts-ignore
-        for (let i = 0; i < parent.childrenCount; i++) {
-            //@ts-ignore
-            var _comp = parent.children[i].getComponent("ChoiceAnswerItem");
-            if (_comp) {          
-                //@ts-ignore
-                if (event.target.getComponent("ChoiceAnswerItem").answerItemIndex === Choice.choiceMgr._correctAnswerIndex) {
-                    // 此处不考虑关卡进度
-                    for (let i = 0; i < Choice.choiceMgr._startReward.childrenCount; i++) {   
-                        var _sp =  Choice.choiceMgr._startReward.children[i].getComponent(cc.Sprite);
-                        if (_sp) {
-                            //@ts-ignore
-                            if (_sp.spriteFrame !== this.startReward) {
-                                //@ts-ignore
-                                _sp.spriteFrame = this.startReward;
-                                return;
-                            }
-                        }
-                    }
-                    //TODO: 处理回答正确
-                    Utils.printLog("回答正确", true);
-                    return true;
-                } else {
-                    //TODO: 处理回答错误
-                    Utils.printLog("回答错误", true);
+        var _selfComp =  event.target.getComponent("ChoiceAnswerItem");
+        _selfComp.result.node.opacity = 255;
+        if (_selfComp.answerItemIndex === Choice.choiceMgr._correctAnswerIndex) {
+            for (let i = 0; i < GData.roundNow; i++) {   
+                var _sp =  GMgr.gameMgr.starReward.children[i].getComponent(cc.Sprite);
+                if (_sp) {
                     //@ts-ignore
-                    for (let _i = 0; _i < parent.childrenCount; _i++) {
-                        var _comp = parent.children[_i].getComponent("ChoiceAnswerItem");
-                        cc.tween(_comp.result.node).to(1, {opacity: 0}).start();
+                    if (_sp.spriteFrame !== this.startReward) {
+                        //@ts-ignore
+                        _sp.spriteFrame = this.startReward;
+                        return;
                     }
-                    return false;
                 }
             }
+            Utils.printLog("回答正确", true);
+            _selfComp.result.spriteFrame = this.correct;
+        } else {
+            Utils.printLog("回答错误", true);
+            _selfComp.result.spriteFrame = this.wrong;
         }
+        
+        cc.tween(_selfComp.result.node).to(1.5, {opacity: 0}).start();
     }
 
     // update (dt) {}

@@ -32,19 +32,20 @@ export default class Utils{
      * @param prefab 指定预制体
      */
 
-    public static loadAnyNumPrefab(value: number, parentNode: cc.Node, prefab: cc.Prefab, callback?: Function) {
+    public static loadAnyNumPrefab(value: number, parentNode: cc.Node, prefab: cc.Prefab | cc.Node, callback?: Function) {
         if (parentNode) {
             if (parentNode.childrenCount > value) {
                 for (let i = value; i < parentNode.childrenCount; i++) {
                     parentNode.children[i].destroy();
+                    if (callback) callback();
                 }
             } else if (parentNode.childrenCount < value) {
                 if (prefab) {
                     for (let i = parentNode.childrenCount; i < value; i++) {
                         let node = cc.instantiate(prefab);
-                        node.y = 0;
+                        //@ts-ignore
                         parentNode.addChild(node);
-                        if (callback) callback(node);
+                        if (callback) callback(node, i);
                     }
                 }
             }
@@ -70,4 +71,10 @@ export default class Utils{
         if (totalSecond < 0) return 0;
         return ((totalSecond % 3600) % 60);
     }
+
+
+    public static randomFunc(min,max){
+        return Math.floor(Math.random()*(max-min+1)+min);
+ 
+     }
 }
