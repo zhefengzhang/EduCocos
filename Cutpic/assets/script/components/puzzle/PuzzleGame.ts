@@ -206,7 +206,7 @@ export default class PuzzleGame extends EduElementAbstract {
                     item.height = self.cellHeight;
 
                 } else {
-                    //@ts-ignore 编辑器上注释掉
+                    //@ts-ignore 
                     this.scheduleOnce(() => {
                         itemCom.spriteFrame = null;
                         // console.log(x + k * childWidth, y + i * childHeight, childWidth, childHeight)
@@ -222,8 +222,22 @@ export default class PuzzleGame extends EduElementAbstract {
                 }
             }
         }
-
+        // this._changePosData();
+        let children = this.layoutNode.children;
+        let arr = this.randArr(children);
         this._savePicData();
+    }
+
+    _changePosData(){
+        let children = this.layoutNode.children;
+        
+
+        let arr = this.randArr(children);
+      
+        // for (var i = 0; i < arr.length; i++) {
+        //     console.log(arr[i].getComponent('PicNum').num,'>shuju')
+        // }
+       
     }
 
     //设置图片框间隔-横向
@@ -325,17 +339,19 @@ export default class PuzzleGame extends EduElementAbstract {
     confirmPos(node, pos) {
         let self = this;
         console.log(pos.x, pos.y, ">>>>confirmPos", this._posData)
-
+        let _isTrue = 1;
         for (let index = 0; index < this._posData.length; index++) {
             const element = this._posData[index];
             let boxCom = self.container.children[index].getComponent('BoxState');
-            // let boxNum = boxCom._boxNum;
+            let boxNum = boxCom._boxNum;
             let nodeCom = node.getComponent('PicNum');
-            // let picNum = nodeCom.num;
+            let picNum = nodeCom.num;
+            console.log(boxNum,'>>boxNum>>',picNum)
+            self.container.children[index].color = new cc.Color(255, 255, 255, 255);
+
             if ((pos.x > element.minX && pos.x < element.maxX)
                 && (pos.y > element.minY && pos.y < element.maxY)
-                && boxCom._isHave == false) {
-                self.container.children[index].color = new cc.Color(255, 255, 255, 255);
+                && boxCom._isHave == false && boxNum == picNum) {
                 node.getComponent('PicNum')._canMove = false;
                 node.parent = self.container.children[index];
                 node.setPosition(cc.v2(0, 0));
@@ -345,6 +361,7 @@ export default class PuzzleGame extends EduElementAbstract {
                 break;
             }
         }
+
     }
 
     //检查任务完成度

@@ -351,6 +351,19 @@ export default class ConnectGame extends EduElementAbstract {
         console.log(startPos.x, ">>>>", startPos.y);
         console.log(endPos.x, ">>>>", endPos.y)
         let flag = this.getAnswerStatu();
+        if(!flag){
+            
+            
+            let tween = cc.tween()
+                            .repeat(5,
+                                cc.tween().to(0.1, { angle: 5 }).to(0.1, { angle: -5 })
+                            )
+                            .set({angle:0})
+            tween.clone(this._rightNode).start()
+            tween.clone(this._leftNode).start()
+
+            return;
+        }
         //计算问题和答案的角度
         let dtX = endPos.x - startPos.x;
         let dtY = endPos.y - startPos.y;
