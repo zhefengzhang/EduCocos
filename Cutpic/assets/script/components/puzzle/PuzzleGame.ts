@@ -11,22 +11,18 @@ const { ccclass, property, menu } = cc._decorator;
 @menu("教育课件题型组件/拼图")
 export default class PuzzleGame extends EduElementAbstract {
 
-    @property(cc.Node)
+    @property({ type: cc.Node, displayName: '显示图片' })
     imageNode: cc.Node = null;
-    @property(cc.Prefab)
+    @property({ type: cc.Prefab, displayName: '右边切图小方块' })
     boxItem: cc.Prefab = null;
-    @property(cc.Prefab)
+    @property({ type: cc.Prefab, displayName: '左边切图小方块' })
     contentItem: cc.Prefab = null;
-    @property(cc.Node)
+    @property({ type: cc.Node, displayName: '右边切图容器' })
     layoutNode: cc.Node = null;
-    @property(cc.Texture2D)
-    testT2: cc.Texture2D = null;
-
-    @property(cc.Node)
+    // @property({ type: cc.Texture2D, displayName: '切图模板' })
+    // testT2: cc.Texture2D = null;
+    @property({ type: cc.Node, displayName: '左边切图容器' })
     container: cc.Node = null;
-    @property(cc.Integer)
-    horNum = 0;
-
     //#region 问题数量
     @property
     _horNum: number = 0;
@@ -37,11 +33,12 @@ export default class PuzzleGame extends EduElementAbstract {
     }
     set eduHorNum(v) {
         this._horNum = v;
-
+        if (this._horNum >= 0) {
+            this._cutState = false;
+            this.cutPic();
+        }
     }
     //#endregion
-    @property(cc.Integer)
-    verNum = 0;
 
     //#region 问题数量
     @property
@@ -53,11 +50,14 @@ export default class PuzzleGame extends EduElementAbstract {
     }
     set eduVerNum(v) {
         this._verNum = v;
-
+        if (this._verNum >= 0) {
+            this._cutState = false;
+            this.cutPic();
+        }
     }
     //#endregion
-    @property(cc.Float)
-    picSpaceX = 0;
+
+    //#region 横向间隔
     @property
     _picSpaceX: number = 0;
     @property({ type: cc.Float, displayName: '横向间隔', min: 0, step: 1 })
@@ -70,8 +70,9 @@ export default class PuzzleGame extends EduElementAbstract {
         this.modifySpcaceX();
 
     }
-    @property(cc.Float)
-    picSpaceY = 0;
+    //#endregion
+
+    //#region 纵向间隔
     @property
     _picSpaceY: number = 0;
     @property({ type: cc.Float, displayName: '纵向间隔', min: 0, step: 1 })
@@ -83,23 +84,25 @@ export default class PuzzleGame extends EduElementAbstract {
         this._picSpaceY = v;
         this.modifySpcaceY();
     }
-    //#region 切图开关
-    @property
-    _beginCut = false;
-    @property({ type: cc.Boolean, tooltips: '拖动开关' })
-    @eduProperty({ displayName: '拖动开关' })
-    get eduBeginCut() {
-        return this._beginCut;
-    }
-    set eduBeginCut(v) {
-        this._beginCut = v;
-        if (this._beginCut) {
-            this.cutPic();
-        }
-    }
     //#endregion
-    @property(cc.SpriteFrame)
-    picArray: Array<cc.SpriteFrame> = [];
+    // //#region 切图开关
+    // @property
+    // _beginCut = false;
+    // @property({ type: cc.Boolean, tooltips: '拖动开关' })
+    // @eduProperty({ displayName: '拖动开关' })
+    // get eduBeginCut() {
+    //     return this._beginCut;
+    // }
+    // set eduBeginCut(v) {
+    //     this._beginCut = v;
+    //     if (this._beginCut) {
+    //         this._cutState = false;
+    //         this.cutPic();
+    //     }
+    // }
+    // //#endregion
+    // @property(cc.SpriteFrame)
+    // picArray: Array<cc.SpriteFrame> = [];
     _cutState = false;
     _picNum = 0;
     _posData = [];
@@ -108,35 +111,18 @@ export default class PuzzleGame extends EduElementAbstract {
     cellWidth = 0;
     cellHeight = 0;
     start() {
-        if (!CC_EDITOR) {
+        if (!CC_EDITOR) { //运行时需要延迟一帧
             //@ts-ignore
             this.scheduleOnce(() => {
+
                 this.cutPic();
 
             })
 
         }
     }
-    // cutPic(){
-    //     let self = this;
-    //     self.layoutNode.destroyAllChildren();  
-    //     let arr = this.randArr(this.picArray);
-    //     console.log(arr);
-    //     let num = 0;
-    //     for (let i = 0; i < this.verNum; i++) {
-    //         for (let k = 0; k < this.horNum; k++) {
-    //             const item = cc.instantiate(this.boxItem);
-    //             self.layoutNode.addChild(item);
-    //             let itemCom = item.getComponent(cc.Sprite);
-    //             console.log(arr[num]._name);
-    //             itemCom.spriteFrame = arr[num];
-    //             num+=1;
 
-    //             item.addComponent('PicNum').num = self._picNum;
-    //             self._picNum += 1;
-    //         }
-    //     }
-    // }
+    //打乱排序
     randArr(arr) {
         for (var i = 0; i < arr.length; i++) {
             //@ts-ignore
@@ -150,7 +136,6 @@ export default class PuzzleGame extends EduElementAbstract {
 
     //将图片分割，切图，初始化数据
     cutPic() {
-
         let self = this;
         self.layoutNode.destroyAllChildren();
         if (this._cutState) {
@@ -166,22 +151,30 @@ export default class PuzzleGame extends EduElementAbstract {
         let y = rect.y;
         let width = rect.width;
         let height = rect.height;
-        console.log(sp.getRect(), ">>>");
+        // console.log(sp.getRect(), ">>>");
         let totalWidth = width;
         let totalHeight = height;
-        let childWidth = totalWidth / this.horNum;
-        let childHeight = totalHeight / this.verNum;
+        let childWidth = totalWidth / this._horNum;
+        let childHeight = totalHeight / this._verNum;
         //@ts-ignore
         this._totalWidth = this.imageNode.width;
         //@ts-ignore
         this._totalHeight = this.imageNode.height;
-        this.cellWidth = this._totalWidth / this.horNum;
-        this.cellHeight = this._totalHeight / this.verNum;
-        this.layoutNode.width = this.horNum * this.cellWidth;
-       
-       
-        for (let i = 0; i < this.verNum; i++) {
-            for (let k = 0; k < this.horNum; k++) {
+        this.cellWidth = this._totalWidth / this._horNum;
+        this.cellHeight = this._totalHeight / this._verNum;
+        this.layoutNode.width = this._horNum * this.cellWidth;
+        let layoutCom = this.layoutNode.getComponent(cc.Layout);
+        // let totalWidth = this.imageNode.width;
+        // let totalHeight = this.imageNode.height;
+
+        // let cellWidth = totalWidth / this.horNum;
+        // let cellHeight = totalHeight / this.verNum;
+        //@ts-ignore
+        layoutCom.cellSize.width = this.cellWidth - 30;
+        //@ts-ignore
+        layoutCom.cellSize.height = this.cellHeight - 30;
+        for (let i = 0; i < this._verNum; i++) {
+            for (let k = 0; k < this._horNum; k++) {
                 const item = new cc.Node();
                 self.layoutNode.addChild(item);
                 self._picNum += 1;
@@ -191,30 +184,26 @@ export default class PuzzleGame extends EduElementAbstract {
                 // item.height = self.cellHeight;
                 let com = item.addComponent('PicNum');
                 com.num = self._picNum;
-                com.data = {hor:k,ver:i};
-                console.log(com.data,'?????');
-                
+                com.data = { hor: k, ver: i };
                 let newsp = new cc.SpriteFrame();
-                newsp.setTexture(this.testT2);
+                // newsp.setTexture(this.testT2);
+                newsp.setTexture(sp._texture);
+
                 itemCom.spriteFrame = newsp;
                 if (CC_EDITOR) {
                     itemCom.spriteFrame = null;
-                    Editor.log(x + k * childWidth, y + i * childHeight, childWidth, childHeight)
+                    // Editor.log(x + k * childWidth, y + i * childHeight, childWidth, childHeight)
                     newsp.setRect(new cc.Rect(x + k * childWidth, y + i * childHeight, childWidth, childHeight));
                     itemCom.spriteFrame = newsp;
                     item.width = self.cellWidth;
                     item.height = self.cellHeight;
 
                 } else {
-                    //@ts-ignore 
+                    //@ts-ignore 运行时需要延迟一帧
                     this.scheduleOnce(() => {
                         itemCom.spriteFrame = null;
-                        // console.log(x + k * childWidth, y + i * childHeight, childWidth, childHeight)
-
                         newsp.setRect(new cc.Rect(x + k * childWidth, y + i * childHeight, childWidth, childHeight));
                         itemCom.spriteFrame = newsp;
-                        console.log(newsp, '???newsp');
-
                         item.width = self.cellWidth;
                         item.height = self.cellHeight;
                     })
@@ -224,34 +213,29 @@ export default class PuzzleGame extends EduElementAbstract {
         }
         // this._changePosData();
         let children = this.layoutNode.children;
-        let arr = this.randArr(children);
+        this.randArr(children);
         this._savePicData();
     }
 
-    _changePosData(){
+    //打乱图片排序
+    _changePosData() {
         let children = this.layoutNode.children;
-        
+        this.randArr(children);
 
-        let arr = this.randArr(children);
-      
-        // for (var i = 0; i < arr.length; i++) {
-        //     console.log(arr[i].getComponent('PicNum').num,'>shuju')
-        // }
-       
     }
 
     //设置图片框间隔-横向
     modifySpcaceX() {
         let com = this.layoutNode.getComponent(cc.Layout);
         //@ts-ignore
-        com.spacingX = this.picSpaceX;
+        com.spacingX = this._picSpaceX;
     }
 
     //设置图片框间隔-竖向
     modifySpcaceY() {
         let com = this.layoutNode.getComponent(cc.Layout);
         //@ts-ignore
-        com.spacingY = this.picSpaceY;
+        com.spacingY = this._picSpaceY;
     }
 
     //可以开始移动图片了
@@ -261,22 +245,30 @@ export default class PuzzleGame extends EduElementAbstract {
     }
 
 
-    //保存图片位置信息
+    //保存图片位置信息--左边透明框
     _savePicData() {
         this.container.destroyAllChildren();
         let allNode = this.container.children;
         // let item = cc.instantiate(this.boxItem);
-        this.container.width = this.horNum * this.cellWidth;
+        this.container.width = this._horNum * this.cellWidth;
         this._posData = [];
-        let leng = this.horNum * this.verNum;
+        let leng = this._horNum * this._verNum;
         let num = 0;
         let self = this;
+        let layoutCom = this.container.getComponent(cc.Layout);
+        let cellWidth = this._totalWidth / this._horNum;
+        let cellHeight = this._totalHeight / this._verNum;
+        //@ts-ignore
+        layoutCom.cellSize.width = cellWidth;
+        //@ts-ignore
+        layoutCom.cellSize.height = cellHeight;
+
         for (let index = 0; index < leng; index++) {
             let childNode = cc.instantiate(this.contentItem);
             this.container.addChild(childNode);
             childNode.active = true;
-            childNode.width = this.cellWidth;
-            childNode.height = this.cellHeight;
+            childNode.width = cellWidth;
+            childNode.height = cellHeight;
             num += 1;
             childNode.getComponent('BoxState')._boxNum = num;
 
@@ -293,7 +285,7 @@ export default class PuzzleGame extends EduElementAbstract {
                 const element = allNode[index];
                 let elePos = element.position;
                 let nodepos = element.convertToWorldSpaceAR(cc.v2(0, 0));
-                console.log(nodepos, '>>>>>????')
+                // console.log(nodepos, '>>>>>????')
                 let pos = {
                     minX: nodepos.x - element.width / 2,
                     maxX: nodepos.x + element.width / 2,
@@ -310,12 +302,13 @@ export default class PuzzleGame extends EduElementAbstract {
     //检查是否移动到正确位置
     checkPos(node, pos) {
         // let pos = //this.container.convertToNodeSpaceAR(node.position);
-        
+
         let self = this;
-        console.log(pos.x, pos.y, ">>>>check", this._posData)
+        // console.log(pos.x, pos.y, ">>>>check", this._posData)
         for (let index = 0; index < self.container.children.length; index++) {
             const element = self.container.children[index];
-            element.color = new cc.Color(255, 255, 255, 255);
+            element.getComponent('BoxState').changeSprite(false);
+            // element.color = new cc.Color(255, 255, 255, 255);
         }
         for (let index = 0; index < this._posData.length; index++) {
             const element = this._posData[index];
@@ -327,7 +320,8 @@ export default class PuzzleGame extends EduElementAbstract {
                 && boxCom._isHave == false) {
 
                 // console.log(element, '>>', boxCom._isHave, index)
-                self.container.children[index].color = cc.Color.RED;
+                // self.container.children[index].color = cc.Color.RED;
+                self.container.children[index].getComponent('BoxState').changeSprite(true);
 
 
                 break;
@@ -338,7 +332,7 @@ export default class PuzzleGame extends EduElementAbstract {
     //确定位置不移动，设置图片位置
     confirmPos(node, pos) {
         let self = this;
-        console.log(pos.x, pos.y, ">>>>confirmPos", this._posData)
+        // console.log(pos.x, pos.y, ">>>>confirmPos", this._posData)
         let _isTrue = 1;
         for (let index = 0; index < this._posData.length; index++) {
             const element = this._posData[index];
@@ -346,8 +340,9 @@ export default class PuzzleGame extends EduElementAbstract {
             let boxNum = boxCom._boxNum;
             let nodeCom = node.getComponent('PicNum');
             let picNum = nodeCom.num;
-            console.log(boxNum,'>>boxNum>>',picNum)
-            self.container.children[index].color = new cc.Color(255, 255, 255, 255);
+            // console.log(boxNum, '>>boxNum>>', picNum)
+            // self.container.children[index].color = new cc.Color(255, 255, 255, 255);
+            self.container.children[index].getComponent('BoxState').changeSprite(false);
 
             if ((pos.x > element.minX && pos.x < element.maxX)
                 && (pos.y > element.minY && pos.y < element.maxY)
@@ -355,6 +350,8 @@ export default class PuzzleGame extends EduElementAbstract {
                 node.getComponent('PicNum')._canMove = false;
                 node.parent = self.container.children[index];
                 node.setPosition(cc.v2(0, 0));
+                node.width = node.parent.width;
+                node.height = node.parent.height;
                 self.container.children[index].getComponent('BoxState')._isHave = true;
                 // console.log(self.container.children[index], 'self.container.children[index]')
                 self.checkFinish();

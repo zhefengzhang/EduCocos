@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "a5cc7f7c-89ce-4a07-b25e-5ac8ce8ea8b4",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 1920,
+  "height": 1080,
+  "platformSettings": {},
+  "subMetas": {
+    "主城-夜晚": {
+      "ver": "1.0.4",
+      "uuid": "d30bfdd8-9611-44be-a0cf-f3e914cc99f3",
+      "rawTextureUuid": "a5cc7f7c-89ce-4a07-b25e-5ac8ce8ea8b4",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 1920,
+      "height": 1080,
+      "rawWidth": 1920,
+      "rawHeight": 1080,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}
