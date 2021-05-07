@@ -3,12 +3,12 @@ const {ccclass, property} = cc._decorator;
 @ccclass
 export default class GameData{
     /**
-     * @zh ����ʱ����
+     * @zh 倒计时
      */
     public static countDownTime: number = null;
 
     /**
-     * @zh ��Ϸ�ܾ���
+     * @zh 游戏总关卡数
      */
     public static gRoundCount: number = 0;
 

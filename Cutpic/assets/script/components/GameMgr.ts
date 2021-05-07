@@ -33,12 +33,25 @@ export default class GameMgr extends EduElementAbstract {
     }
     //#endregion
 
+    
+    //#region 下一关按钮
+    @property(cc.Node)
+    nextRoundBtn: cc.Node = null;
+    //#endregion
+
     //#region 奖励
     @property(cc.Node)
     starReward: cc.Node = null;
 
     @property(cc.Prefab)
     startRewardPfb: cc.Prefab = null;
+
+    @property(cc.SpriteFrame)
+    noStartReward: cc.SpriteFrame = null;
+
+    @property(cc.SpriteFrame)
+    startReward: cc.SpriteFrame = null;
+
     //#endregion
 
     //#region 倒计时
@@ -50,6 +63,11 @@ export default class GameMgr extends EduElementAbstract {
 
     @property(cc.Label)
     countDownSecond: cc.Label = null;
+
+    @property(cc.Prefab)
+    countDownTimePrfb: cc.Prefab = null;
+
+    countDownTime: cc.Node = null;
     //#endregion
 
     onLoad() {
@@ -66,6 +84,16 @@ export default class GameMgr extends EduElementAbstract {
             this.updateRoundStartNum(GData.gRoundCount);
         }
         if (!CC_EDITOR) {
+            for (let i = 0; i < GData.roundNow; i++) {   
+                var _sp =  this.starReward.children[i].getComponent(cc.Sprite);
+                if (_sp) {
+                    //@ts-ignore
+                    if (_sp.spriteFrame !== this.startReward) {
+                        //@ts-ignore
+                        _sp.spriteFrame = this.startReward;
+                    }
+                }
+            }
             this.countDownStart();
             Audio.audioMgr.playBackgroundMusic();
         }
@@ -104,13 +132,25 @@ export default class GameMgr extends EduElementAbstract {
      * @zh 逐游戏帧更新倒计时
      */
     updateCountDownTime () {
+        if (!this.countDownMinute || !this.countDownSymbol || !this.countDownSecond || this.countDownMinute.string === "" || this.countDownSecond.string === "") return;
         if (GData.countDownTime < 0) {
             //@ts-ignore
             this.unschedule(this.updateCountDownTime, this);
-            Utils.printLog("倒计时结束", true);
+            // Utils.printLog("倒计时结束", true);
+            return;
             //TODO: 处理作答结束
         }
-        if (this.countDownMinute.string === "" || this.countDownSecond.string === "") return;
+        if (GData.countDownTime === 10) {
+            if (this.countDownTime) return;
+            //@ts-ignore
+            Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, this.countDownTimePrfb, (countDownTime, i)=>{
+                this.countDownTime = countDownTime;
+                cc.tween(this.countDownTime).to(3, {opacity: 0}).call(()=>{
+                    this.countDownTime.destroy();
+                    this.countDownTime = null;
+                }).start();
+            })
+        }
         GData.countDownTime = Number(this.countDownMinute.string) * 60 + Number(this.countDownSecond.string);
         GData.countDownTime--;
         var minute = Utils.CountDownFewMinutes(GData.countDownTime);
