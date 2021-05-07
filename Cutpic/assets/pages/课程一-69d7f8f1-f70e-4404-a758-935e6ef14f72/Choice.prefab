@@ -5409,14 +5409,34 @@
     },
     "_correctAnswerIndex": 1,
     "correctAnswerTipsType": 0,
-    "correctAnswerTipsLabSpf1": null,
-    "correctAnswerTipsLabSpf2": null,
+    "correctAnswerTipsLabSpf1": {
+      "__uuid__": "bd0628c2-df55-482e-a36f-927fa07947a5"
+    },
+    "correctAnswerTipsLabSpf2": {
+      "__uuid__": "47a3a1fe-8af9-4655-8446-664e44df16aa"
+    },
     "wrongAnswerTipsType": 0,
-    "wrongAnswerTipsLabSpf1": null,
-    "wrongAnswerTipsLabSpf2": null,
-    "correctionAnswerTipsSpf": null,
-    "wrongAnswerTipsSpf": null,
-    "tipsPrfb": null,
+    "wrongAnswerTipsLabSpf1": {
+      "__uuid__": "01159975-26e2-45eb-b183-b022561d82fc"
+    },
+    "wrongAnswerTipsLabSpf2": {
+      "__uuid__": "9ea6a345-d707-4edf-b510-74b9bcc86ae7"
+    },
+    "correctionAnswerTipsSpf": {
+      "__uuid__": "a908fffe-9708-43fd-8b95-df7da9636d70"
+    },
+    "wrongAnswerTipsSpf": {
+      "__uuid__": "bc6e9e5f-28ed-4d9b-a490-0e8e5602cde0"
+    },
+    "correctTipsPrfb": {
+      "__uuid__": "b2794780-8b2c-458d-a1a7-6998c1028266"
+    },
+    "wrongTipsPrfb": {
+      "__uuid__": "6b40469f-d7cb-4321-a1d1-ad4ed853bc33"
+    },
+    "timeComing": {
+      "__uuid__": "b35412b4-4dcb-4687-b018-01254ba458b2"
+    },
     "tips": null,
     "_id": ""
   },
