@@ -47,6 +47,7 @@ export default class NewClass extends cc.Component {
                 }     
         }
         fillInMgr.updateQuestion(null, null, this.resultNumString);
+        this.onCommit();
     }
 
     /**
@@ -55,14 +56,13 @@ export default class NewClass extends cc.Component {
     onCommit () {
         if (this.resultNumString === FillIn.fillInMgr.correctAnswerNumber.toString()) {
             Utils.printLog("回答正确", true);
-                FillIn.fillInMgr.openTips(true);
-                Round.roundMgr.updateStarReward();
+            FillIn.fillInMgr.openTips(true);
+            FillIn.fillInMgr.animation.getComponent(cc.Animation).play();
+            Round.roundMgr.updateStarReward();
         } else {
             Utils.printLog("回答错误", true);
             FillIn.fillInMgr.openTips(false);
         }
         this.node.active = false;
-
-        FillIn.fillInMgr.animation.getComponent(cc.Animation).play();
     }
 }
