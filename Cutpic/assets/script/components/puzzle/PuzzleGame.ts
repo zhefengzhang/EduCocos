@@ -171,6 +171,7 @@ export default class PuzzleGame extends EduElementAbstract {
             })
 
         }
+        PuzzleData.finishGame = false;
         PuzzleData.startParent = this.layoutNode;
         PuzzleData.moveParent = this.moveParent;
         //@ts-ignore
@@ -271,9 +272,16 @@ export default class PuzzleGame extends EduElementAbstract {
         this.randArr(children);
         this._savePicData();
         //@ts-ignore
-        this.imageNode.getComponent(cc.Sprite).spriteFrame = this.ImageNodeChanged.getComponent(cc.Sprite).spriteFrame;
+        let tempSp = new cc.SpriteFrame();
         //@ts-ignore
-        this.ImageNodeChanged.getComponent(cc.Sprite).spriteFrame = this.ImageNodeChangedSp;
+        tempSp.setTexture(this.ImageNodeChanged.getComponent(cc.Sprite).spriteFrame._texture);
+        //@ts-ignore
+        this.imageNode.getComponent(cc.Sprite).spriteFrame = tempSp;
+        if(!CC_EDITOR){
+            //@ts-ignore
+            this.ImageNodeChanged.getComponent(cc.Sprite).spriteFrame = this.ImageNodeChangedSp;
+
+        }
     }
 
     //打乱图片排序
@@ -410,15 +418,18 @@ export default class PuzzleGame extends EduElementAbstract {
                 // && boxCom._isHave == false) {
                 //调换位置
                 let child = self.container.children[index].children;
-                if (PuzzleData.layoutNull) {
+                console.log(boxCom._isHave,'isHave');
+                
+                if (boxCom._isHave && parentIndex!=null ) {
                     for (let k = 0; k < child.length; k++) {
                         let ele = child[k].getComponent('PicNum');
-                        if (ele) {
+                        if (ele && ele.parentIndex) {
                             // ele.node.parent = self.container.children[parentIndex];
                             console.log(self.container.children[parentIndex], parentIndex, '???parentin')
                             // self.container.children[parentIndex].color = cc.Color.RED;
                             ele.node.parent = null;
                             self.container.children[parentIndex].addChild(ele.node);
+                            self.container.children[parentIndex].getComponent('BoxState')._isHave = true;
                             ele.node.setPosition(cc.v2(0, 0));
                             // ele.node.width = node.parent.width;
                             // ele.node.height = node.parent.height;
@@ -426,6 +437,7 @@ export default class PuzzleGame extends EduElementAbstract {
                             if (boxNum == ele.num) {
                                 ele.node.getComponent('PicNum')._isCorrect = true;
                             }
+                            break;
                         }
                     }
                 }
@@ -438,9 +450,16 @@ export default class PuzzleGame extends EduElementAbstract {
                     for (let k = 0; k < child.length; k++) {
                         let ele = child[k].getComponent('PicNum');
                         console.log(ele, '>>>>>111111')
-                        if (ele) {
-                            ele.node.parent = self.layoutNode;
-                            self.layoutNode.getComponent(cc.Layout).enabled = true;
+                        if (ele ) {
+                            if(ele.parentIndex==null || node.getComponent('PicNum').parentIndex == null){
+                                ele.node.parent = null;
+                                self.layoutNode.addChild(ele.node);
+                                self.layoutNode.getComponent(cc.Layout).enabled = true;
+                                ele.init();
+                                console.log(self.layoutNode, '>>>>>layoutNode')
+
+                            }
+                            
                         }
                     }
 
@@ -501,7 +520,7 @@ export default class PuzzleGame extends EduElementAbstract {
         if (finishNum == total) {
             console.log('完成拼图');
             self.finishNode.active = true;
-
+            PuzzleData.finishGame = true;
         }
         console.log(finishNum, '>>>>finishNum')
     }

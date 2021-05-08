@@ -25,6 +25,13 @@ export default class NewClass extends cc.Component {
 
     }
 
+    init() {
+        this._canMove = true;
+        this.parentIndex = null;
+        this._startMove = false;
+        this._isCorrect = false;
+        this._isMove = false;
+    }
     onDisable() {
         this.removeTouchEvent();
     }
@@ -43,13 +50,14 @@ export default class NewClass extends cc.Component {
         this.node.off(cc.Node.EventType.TOUCH_END, this._onTouchEnd, this);
     }
     _onTouchStart(event) {
+        if(PuzzleData.finishGame)return;
         // let e = event.getLocation();
         // console.log('e:', e);
         if (this.node.parent.getComponent(cc.Layout)) {
             this.node.parent.getComponent(cc.Layout).enabled = false;
 
         }
-        if(this.node.parent.getComponent('BoxState')){
+        if (this.node.parent.getComponent('BoxState')) {
             this.node.parent.getComponent('BoxState')._isHave = false;
 
         }
@@ -61,11 +69,16 @@ export default class NewClass extends cc.Component {
         this.parentNode = PuzzleData.gameParent;
     }
     _onTouchMove(event) {
-        console.log(this._canMove,this._isCorrect,this._startMove,'}}}}')
+        if(PuzzleData.finishGame)return;
+
+        // console.log(this._canMove,this._isCorrect,this._startMove,'}}}}')
         // if (!this._canMove ){//&& this._isCorrect) {
-            // return;
+        // return;
         // }
         if (!this._startMove) {
+            if (PuzzleData.startParent.getComponent(cc.Layout)) {
+                PuzzleData.startParent.getComponent(cc.Layout).enabled = true;
+            }
             this.node.parent = PuzzleData.moveParent;
         }
         this._startMove = true;
@@ -84,7 +97,7 @@ export default class NewClass extends cc.Component {
     }
 
     _onTouchEnd(event) {
-
+        if(PuzzleData.finishGame)return;
         if (this.node.parent.getComponent(cc.Layout)) {
             this.node.parent.getComponent(cc.Layout).enabled = true;
 

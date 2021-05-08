@@ -89,7 +89,7 @@
   {
     "__type__": "cc.Node",
     "_name": "white",
-    "_objFlags": 0,
+    "_objFlags": 512,
     "_parent": {
       "__id__": 1
     },
@@ -196,7 +196,7 @@
   {
     "__type__": "cc.Node",
     "_name": "blue",
-    "_objFlags": 0,
+    "_objFlags": 512,
     "_parent": {
       "__id__": 1
     },

@@ -20,4 +20,9 @@ export default class PuzzleData {
     * @zh 是否移动完毕
     */
     public static layoutNull = false;
+
+    /**
+    * @zh 是否移动完毕
+    */
+     public static finishGame = false;
 }
