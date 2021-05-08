@@ -34,18 +34,7 @@ export default class NewClass extends cc.Component {
 
     onNumKeyboardTouch (event, eventData: string) {
         var fillInMgr = FillIn.fillInMgr;
-        switch (eventData) {
-            case "reset":
-                this.resultNumString = "";
-                break;
-            case "delete":
-                this.resultNumString = this.resultNumString.slice(0, this.resultNumString.length - 1);
-            break;
-            default:
-                if (eventData !== "reset" && eventData !== "clean") {
-                    this.resultNumString += eventData;
-                }     
-        }
+        this.resultNumString += eventData;
         fillInMgr.updateQuestion(null, null, this.resultNumString);
         this.onCommit();
     }
