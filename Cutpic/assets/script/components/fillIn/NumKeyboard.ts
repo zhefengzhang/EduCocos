@@ -9,7 +9,6 @@ const {ccclass, property} = cc._decorator;
 
 import FillIn from "./FillInMgr";
 import Utils from "../Utils";
-import GData from "../GameData";
 import Round from "../Round";
 
 @ccclass

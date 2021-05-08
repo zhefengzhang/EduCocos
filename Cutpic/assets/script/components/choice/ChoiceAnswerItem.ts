@@ -3,7 +3,6 @@ declare var cc: any;
 import { eduProperty, i18n } from "education";
 
 import Choice from "./ChoiceMgr"
-import GData from "../GameData";
 import Utils from "../Utils";
 import Round from "../Round";
 //@ts-ignore

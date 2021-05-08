@@ -114,9 +114,6 @@ export default class Choice extends EduElementAbstract {
     @property({type: cc.Prefab})
     wrongTipsPrfb: cc.Prefab = null;
 
-    @property({type: cc.Prefab})
-    timeComing: cc.Prefab = null;
-
     tips: cc.Node = null;
     //#endregion
 
