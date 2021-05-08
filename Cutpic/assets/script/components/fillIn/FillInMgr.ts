@@ -120,13 +120,7 @@ export default class FillIn extends EduElementAbstract {
     waterTempHeight: number = 0;
 
     @property(cc.Node)
-    waterTop: cc.Node = null;
-
-    @property(cc.Node)
     waterCenter: cc.Node = null;
-
-    @property(cc.Node)
-    waterBottom: cc.Node = null;
     //#endregion
 
     //#region 动画节点
@@ -188,9 +182,6 @@ export default class FillIn extends EduElementAbstract {
 
     @property({type: cc.Prefab})
     wrongTipsPrfb: cc.Prefab = null;
-
-    @property({type: cc.Prefab})
-    timeComing: cc.Prefab = null;
 
     tips: cc.Node = null;
     //#endregion
