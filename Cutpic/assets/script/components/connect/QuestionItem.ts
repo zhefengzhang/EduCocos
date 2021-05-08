@@ -5,7 +5,7 @@ import { eduProperty, syncNum, i18n } from "education";
 //@ts-ignore
 import EduElementAbstract from "EduElementAbstract";
 
-import Utils from "../Utils";
+import ConnectData from "./ConnectData";
 
 //@ts-ignore
 const { ccclass, property, menu } = cc._decorator;
@@ -43,8 +43,8 @@ export default class QuestionItem extends cc.Component {
             return;
         }
       
-        let parent = this.node.parent.parent.parent;
-        let com = parent.getComponent('ConnectGame');
+        // let parent = this.node.parent.parent;
+        let com = ConnectData.gameParent.getComponent('ConnectGame');
         let index = this.node.parent.children.indexOf(this.node);
         com.clickStart(this.node, index);
 

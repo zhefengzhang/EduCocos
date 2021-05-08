@@ -32,6 +32,14 @@ export default class NewClass extends cc.Component {
      rockStoneFinish: boolean = false;
 
     /**
+     * @zh 激活 widget 组件调整节点位置
+     */
+    widgetActive () {
+        var widgetComp = this.node.getComponent(cc.Widget);
+        widgetComp.enabled = true;
+    }
+
+    /**
      * @zh 投放左边的石头
      */
     putInStoneLeft () {
@@ -67,12 +75,18 @@ export default class NewClass extends cc.Component {
         stoneBoxRect.height -= 12;
         stoneBoxRect.width -= 10;
         var stoneRect = stone.getBoundingBoxToWorld();
+        var waterRect = FillIn.fillInMgr.waterCenter.getBoundingBoxToWorld();
+        if (!stone.getComponent("Stone").isPutInWater) {
+            if (cc.Intersection.rectRect(stoneRect, waterRect)) {
+                stone.getComponent("Stone").isPutInWater = true;
+                FillIn.fillInMgr.updateWaterPosition();
+            }
+        }
         if (!cc.Intersection.rectRect(stoneBoxRect, stoneRect)) {
             stone.y -= 1;
         } else {
             if (stone.parent !== stoneBox) {
                 stone.parent = stoneBox;
-                FillIn.fillInMgr.updateWaterPosition();
             }
         }
     }

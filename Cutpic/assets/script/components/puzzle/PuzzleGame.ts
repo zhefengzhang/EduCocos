@@ -3,22 +3,51 @@ declare var cc: any;
 import { eduProperty, syncNum, i18n } from "education";
 //@ts-ignore
 import EduElementAbstract from "EduElementAbstract";
-
 import Utils from "../Utils";
+import PuzzleData from "./PuzzleData";
+import GEnum from "../GameEnum";
 //@ts-ignore
 const { ccclass, property, menu } = cc._decorator;
 @ccclass
 @menu("教育课件题型组件/拼图")
 export default class PuzzleGame extends EduElementAbstract {
+    
+    @property(cc.Label)
+    questionLab: cc.Label = null;
+
+    @property({type:cc.String, displayName: '问题描述', multiline:true})
+    @eduProperty({displayName: '问题描述'})
+    get question() {
+        //@ts-ignore
+        if (!this.questionLab) {
+            //@ts-ignore
+            return "";
+        }
+        return this.questionLab.string;
+    }
+
+    set question(value) {
+        if (this.questionLab) {
+            this.questionLab.string = value;
+        }
+    }
 
     @property({ type: cc.Node, displayName: '显示图片' })
     imageNode: cc.Node = null;
+    @property({ type: cc.Node, displayName: '待切图片' })
+    ImageNodeChanged: cc.Node = null;
+    @property(cc.SpriteFrame)
+    ImageNodeChangedSp: cc.SpriteFrame = null;
+    @property({ type: cc.Node, displayName: '完成框' })
+    finishNode: cc.Node = null;
     @property({ type: cc.Prefab, displayName: '右边切图小方块' })
     boxItem: cc.Prefab = null;
     @property({ type: cc.Prefab, displayName: '左边切图小方块' })
     contentItem: cc.Prefab = null;
     @property({ type: cc.Node, displayName: '右边切图容器' })
     layoutNode: cc.Node = null;
+    @property({ type: cc.Node, displayName: '移动容器' })
+    moveParent: cc.Node = null;
     // @property({ type: cc.Texture2D, displayName: '切图模板' })
     // testT2: cc.Texture2D = null;
     @property({ type: cc.Node, displayName: '左边切图容器' })
@@ -57,34 +86,72 @@ export default class PuzzleGame extends EduElementAbstract {
     }
     //#endregion
 
-    //#region 横向间隔
-    @property
-    _picSpaceX: number = 0;
-    @property({ type: cc.Float, displayName: '横向间隔', min: 0, step: 1 })
-    @eduProperty({ displayName: '横向间隔' })
-    get eduPicSpaceX() {
-        return this._picSpaceX;
-    }
-    set eduPicSpaceX(v) {
-        this._picSpaceX = v;
-        this.modifySpcaceX();
+    // //#region 横向间隔
+    // @property
+    // _picSpaceX: number = 0;
+    // @property({ type: cc.Float, displayName: '横向间隔', min: 0, step: 1 })
+    // @eduProperty({ displayName: '横向间隔' })
+    // get eduPicSpaceX() {
+    //     return this._picSpaceX;
+    // }
+    // set eduPicSpaceX(v) {
+    //     this._picSpaceX = v;
+    //     this.modifySpcaceX();
 
-    }
+    // }
+    // //#endregion
+
+    // //#region 纵向间隔
+    // @property
+    // _picSpaceY: number = 0;
+    // @property({ type: cc.Float, displayName: '纵向间隔', min: 0, step: 1 })
+    // @eduProperty({ displayName: '纵向间隔' })
+    // get eduPicSpaceY() {
+    //     return this._picSpaceY;
+    // }
+    // set eduPicSpaceY(v) {
+    //     this._picSpaceY = v;
+    //     this.modifySpcaceY();
+    // }
+    // //#endregion
+
+    //#region 弹窗
+    @property({ type: GEnum.correctAnswerTipsType })
+    @eduProperty({ displayName: "回答正确的弹窗文字" })
+    correctAnswerTipsType = GEnum.correctAnswerTipsType.答对了;
+
+    @property(cc.SpriteFrame)
+    correctAnswerTipsLabSpf1: cc.SpriteFrame = null;
+
+    @property(cc.SpriteFrame)
+    correctAnswerTipsLabSpf2: cc.SpriteFrame = null;
+
+    @property({ type: GEnum.wrongAnswerTipsType })
+    @eduProperty({ displayName: "回答错误的弹窗文字" })
+    wrongAnswerTipsType = GEnum.wrongAnswerTipsType.答错了;
+
+    @property(cc.SpriteFrame)
+    wrongAnswerTipsLabSpf1: cc.SpriteFrame = null;
+
+    @property(cc.SpriteFrame)
+    wrongAnswerTipsLabSpf2: cc.SpriteFrame = null;
+
+    @property({ type: cc.SpriteFrame })
+    @eduProperty({ displayName: "回答正确的弹窗图片" })
+    correctionAnswerTipsSpf: cc.SpriteFrame = null;
+
+    @property({ type: cc.SpriteFrame })
+    @eduProperty({ displayName: "回答错误的弹窗图片" })
+    wrongAnswerTipsSpf: cc.SpriteFrame = null;
+
+    @property({ type: cc.Prefab })
+    correctTipsPrfb: cc.Prefab = null;
+
+    @property({ type: cc.Prefab })
+    wrongTipsPrfb: cc.Prefab = null;
     //#endregion
 
-    //#region 纵向间隔
-    @property
-    _picSpaceY: number = 0;
-    @property({ type: cc.Float, displayName: '纵向间隔', min: 0, step: 1 })
-    @eduProperty({ displayName: '纵向间隔' })
-    get eduPicSpaceY() {
-        return this._picSpaceY;
-    }
-    set eduPicSpaceY(v) {
-        this._picSpaceY = v;
-        this.modifySpcaceY();
-    }
-    //#endregion
+
     // //#region 切图开关
     // @property
     // _beginCut = false;
@@ -110,16 +177,20 @@ export default class PuzzleGame extends EduElementAbstract {
     _totalHeight = 0;
     cellWidth = 0;
     cellHeight = 0;
+    _finishNum = 0;
     start() {
         if (!CC_EDITOR) { //运行时需要延迟一帧
             //@ts-ignore
             this.scheduleOnce(() => {
-
                 this.cutPic();
-
             })
 
         }
+        PuzzleData.finishGame = false;
+        PuzzleData.startParent = this.layoutNode;
+        PuzzleData.moveParent = this.moveParent;
+        //@ts-ignore
+        PuzzleData.gameParent = this.node;
     }
 
     //打乱排序
@@ -143,7 +214,7 @@ export default class PuzzleGame extends EduElementAbstract {
         }
         this._cutState = true;
         //@ts-ignore
-        let com = this.imageNode.getComponent(cc.Sprite);
+        let com = this.ImageNodeChanged.getComponent(cc.Sprite);
         //@ts-ignore
         let sp = com.spriteFrame;
         let rect = sp.getRect();
@@ -157,9 +228,9 @@ export default class PuzzleGame extends EduElementAbstract {
         let childWidth = totalWidth / this._horNum;
         let childHeight = totalHeight / this._verNum;
         //@ts-ignore
-        this._totalWidth = this.imageNode.width;
+        this._totalWidth = this.ImageNodeChanged.width;
         //@ts-ignore
-        this._totalHeight = this.imageNode.height;
+        this._totalHeight = this.ImageNodeChanged.height;
         this.cellWidth = this._totalWidth / this._horNum;
         this.cellHeight = this._totalHeight / this._verNum;
         this.layoutNode.width = this._horNum * this.cellWidth;
@@ -215,6 +286,17 @@ export default class PuzzleGame extends EduElementAbstract {
         let children = this.layoutNode.children;
         this.randArr(children);
         this._savePicData();
+        //@ts-ignore
+        let tempSp = new cc.SpriteFrame();
+        //@ts-ignore
+        tempSp.setTexture(this.ImageNodeChanged.getComponent(cc.Sprite).spriteFrame._texture);
+        //@ts-ignore
+        this.imageNode.getComponent(cc.Sprite).spriteFrame = tempSp;
+        if(!CC_EDITOR){
+            //@ts-ignore
+            this.ImageNodeChanged.getComponent(cc.Sprite).spriteFrame = this.ImageNodeChangedSp;
+
+        }
     }
 
     //打乱图片排序
@@ -224,19 +306,19 @@ export default class PuzzleGame extends EduElementAbstract {
 
     }
 
-    //设置图片框间隔-横向
-    modifySpcaceX() {
-        let com = this.layoutNode.getComponent(cc.Layout);
-        //@ts-ignore
-        com.spacingX = this._picSpaceX;
-    }
+    // //设置图片框间隔-横向
+    // modifySpcaceX() {
+    //     let com = this.layoutNode.getComponent(cc.Layout);
+    //     //@ts-ignore
+    //     com.spacingX = this._picSpaceX;
+    // }
 
-    //设置图片框间隔-竖向
-    modifySpcaceY() {
-        let com = this.layoutNode.getComponent(cc.Layout);
-        //@ts-ignore
-        com.spacingY = this._picSpaceY;
-    }
+    // //设置图片框间隔-竖向
+    // modifySpcaceY() {
+    //     let com = this.layoutNode.getComponent(cc.Layout);
+    //     //@ts-ignore
+    //     com.spacingY = this._picSpaceY;
+    // }
 
     //可以开始移动图片了
     play() {
@@ -262,15 +344,15 @@ export default class PuzzleGame extends EduElementAbstract {
         layoutCom.cellSize.width = cellWidth;
         //@ts-ignore
         layoutCom.cellSize.height = cellHeight;
-
         for (let index = 0; index < leng; index++) {
             let childNode = cc.instantiate(this.contentItem);
             this.container.addChild(childNode);
-            childNode.active = true;
+            // childNode.active = true;
             childNode.width = cellWidth;
             childNode.height = cellHeight;
             num += 1;
             childNode.getComponent('BoxState')._boxNum = num;
+            childNode.getComponent('BoxState').changeContentSize();
 
         }
         //@ts-ignore
@@ -304,7 +386,7 @@ export default class PuzzleGame extends EduElementAbstract {
         // let pos = //this.container.convertToNodeSpaceAR(node.position);
 
         let self = this;
-        // console.log(pos.x, pos.y, ">>>>check", this._posData)
+        // console.log(pos.x, pos.y, ">>>>check")
         for (let index = 0; index < self.container.children.length; index++) {
             const element = self.container.children[index];
             element.getComponent('BoxState').changeSprite(false);
@@ -333,51 +415,156 @@ export default class PuzzleGame extends EduElementAbstract {
     confirmPos(node, pos) {
         let self = this;
         // console.log(pos.x, pos.y, ">>>>confirmPos", this._posData)
-        let _isTrue = 1;
+        let _isTrue = false;
+       
+        let nodeCom = node.getComponent('PicNum');
+        let picNum = nodeCom.num;
+        let parentIndex = nodeCom.parentIndex;
         for (let index = 0; index < this._posData.length; index++) {
             const element = this._posData[index];
             let boxCom = self.container.children[index].getComponent('BoxState');
             let boxNum = boxCom._boxNum;
-            let nodeCom = node.getComponent('PicNum');
-            let picNum = nodeCom.num;
+
             // console.log(boxNum, '>>boxNum>>', picNum)
             // self.container.children[index].color = new cc.Color(255, 255, 255, 255);
             self.container.children[index].getComponent('BoxState').changeSprite(false);
 
             if ((pos.x > element.minX && pos.x < element.maxX)
-                && (pos.y > element.minY && pos.y < element.maxY)
-                && boxCom._isHave == false && boxNum == picNum) {
+                && (pos.y > element.minY && pos.y < element.maxY)) {
+                // && boxCom._isHave == false) {
+                //调换位置
+                let child = self.container.children[index].children;
+                console.log(boxCom._isHave,'isHave',parentIndex);
+                if ( parentIndex!=null ) {
+                    for (let k = 0; k < child.length; k++) {
+                        let ele = child[k].getComponent('PicNum');
+                        if (ele && ele.parentIndex !=null) {
+                            // ele.node.parent = self.container.children[parentIndex];
+                            console.log(self.container.children[parentIndex], parentIndex, '???parentin')
+                            // self.container.children[parentIndex].color = cc.Color.RED;
+                            
+                            ele.node.parent = null;
+                            self.container.children[parentIndex].addChild(ele.node);
+                            self.container.children[parentIndex].getComponent('BoxState')._isHave = true;
+                            ele.node.setPosition(cc.v2(0, 0));
+                            // ele.node.width = node.parent.width;
+                            // ele.node.height = node.parent.height;
+                            ele.parentIndex = parentIndex;
+                            if (boxNum == ele.num) {
+                                ele.node.getComponent('PicNum')._isCorrect = true;
+                            }
+
+                            break;
+                        }
+                    }
+                }
                 node.getComponent('PicNum')._canMove = false;
                 node.parent = self.container.children[index];
                 node.setPosition(cc.v2(0, 0));
                 node.width = node.parent.width;
                 node.height = node.parent.height;
-                self.container.children[index].getComponent('BoxState')._isHave = true;
+                if (boxCom._isHave && !PuzzleData.layoutNull) {
+                    for (let k = 0; k < child.length; k++) {
+                        let ele = child[k].getComponent('PicNum');
+                        // console.log(ele, '>>>>>111111')
+                        if (ele ) {
+                            if(ele.parentIndex==null || node.getComponent('PicNum').parentIndex == null){
+                                ele.node.parent = null;
+                                self.layoutNode.addChild(ele.node);
+                                self.layoutNode.getComponent(cc.Layout).enabled = true;
+                                ele.init();
+                                // console.log(self.layoutNode, '>>>>>layoutNode')
+
+                            }
+                            
+                        }
+                    }
+
+                }
+
+                boxCom._isHave = true;
+                boxCom._isMove = true;
+                node.getComponent('PicNum')._startMove = false;
+                node.getComponent('PicNum').parentIndex = index;
+                if (boxNum == picNum) {
+                    node.getComponent('PicNum')._isCorrect = true;
+                }
                 // console.log(self.container.children[index], 'self.container.children[index]')
+                _isTrue = true;
                 self.checkFinish();
                 break;
             }
         }
 
+        if (_isTrue) {
+            // Utils.printLog("回答正确", true);
+            this.openTips(true);
+        } else {
+            node.parent = self.layoutNode;
+            self.layoutNode.getComponent(cc.Layout).enabled = true;
+            // Utils.printLog("回答错误", true);
+            this.openTips(false);
+
+        }
     }
 
     //检查任务完成度
     checkFinish() {
         let containChild = this.container.children;
-        let finishNum = 0;
+        let self = this;
+        let finishNum = 0
         for (let index = 0; index < containChild.length; index++) {
             const element = containChild[index];
             let boxCom = element.getComponent('BoxState');
-            if (element.children[0]) {
-                let nodeCom = element.children[0].getComponent('PicNum');
+            for (let l = 0; l < element.children.length; l++) {
+                let nodeCom = element.children[l].getComponent('PicNum');
                 let boxNum = boxCom._boxNum;
-                let picNum = nodeCom.num;
-                if (boxNum == picNum) {
-                    finishNum += 1;
-                }
+                if (nodeCom) {
+                    let picNum = nodeCom.num;
+                    if (boxNum == picNum) {
+                        // self._finishNum += 1;
+                        finishNum += 1;
+                        break;
+                    }
 
+                }
             }
         }
+        let layoutChild = self.layoutNode.childrenCount;
+        if (layoutChild === 0) {
+            PuzzleData.layoutNull = true;
+        }
+        let total = self._horNum * self._verNum;
+        if (finishNum == total) {
+            console.log('完成拼图');
+            self.finishNode.active = true;
+            PuzzleData.finishGame = true;
+        }
         console.log(finishNum, '>>>>finishNum')
+    }
+    /**
+     * @zh 打开 tips 弹窗
+     */
+    openTips(result) {
+        var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
+        //@ts-ignore
+        Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number) => {
+            var fontSp = tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
+            var boxSp = tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
+            if (result) {
+                //@ts-ignore
+                fontSp.spriteFrame = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
+                //@ts-ignore
+                boxSp.spriteFrame = this.wrongAnswerTipsType;
+            } else {
+                //@ts-ignore
+                fontSp.spriteFrame = this.wrongAnswerTipsType === 0 ? this.wrongAnswerTipsLabSpf1 : this.wrongAnswerTipsLabSpf2;
+                //@ts-ignore
+                boxSp.spriteFrame = this.wrongAnswerTipsSpf;
+            }
+            cc.tween(tips).to(1, { opacity: 0 }).call(() => {
+                tips.destroy();
+            }).start();
+        })
     }
 }

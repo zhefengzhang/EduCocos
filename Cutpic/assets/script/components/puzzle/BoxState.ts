@@ -18,12 +18,20 @@ export default class NewClass extends cc.Component {
     @property(cc.SpriteFrame)
     graySprite: cc.SpriteFrame = null;
     
+    @property(cc.Node)
+    blueNode: cc.Node = null;
+    @property(cc.Node)
+    whiteNode: cc.Node = null;
+    
     changeSprite(flag) {
-        if (flag) {
-            this.node.getComponent(cc.Sprite).spriteFrame = this.blueSprite;
-        } else {
-            this.node.getComponent(cc.Sprite).spriteFrame = this.graySprite;
+        this.blueNode.active = flag;
+        
+    }
+    changeContentSize(){
+        this.blueNode.width = this.node.width + 20;
+        this.blueNode.height = this.node.height + 20;
+        this.whiteNode.width = this.node.width-2;
+        this.whiteNode.height = this.node.height-2;
 
-        }
     }
 }
