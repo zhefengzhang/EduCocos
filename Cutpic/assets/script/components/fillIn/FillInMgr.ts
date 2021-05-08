@@ -8,17 +8,20 @@ import Utils from "../Utils";
 import GEnum from "../GameEnum"
 
 //@ts-ignore
-const {ccclass, property, menu} = cc._decorator;
+const {ccclass, property, menu, executeInEditMode} = cc._decorator;
 
 function insertStr(soure, start, newStr){   
     return soure.slice(0, start) + newStr + soure.slice(start);
 }
 
 @ccclass
+@executeInEditMode
 @menu("教育课件题型组件/填空题")
 export default class FillIn extends EduElementAbstract {
 
     public static fillInMgr: FillIn = null;
+
+    gameWin: boolean = false;
 
     //#region 问题
     @property(cc.Label)
@@ -156,6 +159,8 @@ export default class FillIn extends EduElementAbstract {
     //#region 数字键盘
     @property(cc.Node)
     numKeyboard: cc.Node = null;
+
+    resultNumString: string = "";
     //#endregion
 
     //#region 弹窗
@@ -192,6 +197,31 @@ export default class FillIn extends EduElementAbstract {
 
     @property({type: cc.Prefab})
     wrongTipsPrfb: cc.Prefab = null;
+
+    correctTips: cc.Node = null;
+
+    wrongTips: cc.Node = null;
+    //#endregion
+
+    //#region 背景图片
+    @property(cc.Sprite)
+    bgSprite: cc.Sprite = null;
+
+    @property({type: cc.SpriteFrame})
+    @eduProperty({displayName: "设置背景图片"})
+    get bg() {
+        if (this.bgSprite && this.bgSprite.spriteFrame) {
+            return this.bgSprite.spriteFrame;
+        } else {
+            return null;
+        }
+    }
+
+    set bg(value) {
+        if (this.bgSprite) {
+            this.bgSprite.spriteFrame = value;
+        }
+    }
     //#endregion
 
     /**
@@ -206,23 +236,30 @@ export default class FillIn extends EduElementAbstract {
      * @zh 游戏开始
      */
     start () {
-        this.numKeyboard.active = false;
+        if (!CC_EDITOR) {
+            this.numKeyboard.active = false;
+        }
     }
 
     /**
      * @zh 文本区域点击
      */
     onQuestionLabTouched (event) {
-        this.numKeyboard.active = true;
+        if (!this.gameWin) this.numKeyboard.active = true;
     }
 
     /**
      * @zh 更新水位
      */
     updateWaterPosition () {
-        if (this.waterCenter.height >= 176) return;
-        this.waterTempHeight += this.waterUpdateHeightStep;
-        cc.tween(this.waterCenter).to(1, {height: this.waterTempHeight}, {easing: "smooth"}).start();        
+        var newHeight = 38 + this.stoneCount * this.waterUpdateHeightStep;
+        if (newHeight >= 176) return;
+        if (CC_EDITOR) {
+            this.waterCenter.height = newHeight;
+        } else {
+            this.waterTempHeight += this.waterUpdateHeightStep;
+            cc.tween(this.waterCenter).to(1, {height: this.waterTempHeight}, {easing: "smooth"}).start();
+        }  
     }
 
     /**
@@ -239,25 +276,34 @@ export default class FillIn extends EduElementAbstract {
      * @zh 打开 tips 弹窗
      */
     openTips (result) {
-        var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
-        //@ts-ignore
-        Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number)=>{
-            var fontSp = tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
-            var boxSp = tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
-            if (result) {
-                //@ts-ignore
-                fontSp.spriteFrame = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
-                //@ts-ignore
-                boxSp.spriteFrame = this.correctionAnswerTipsSpf;
-            } else {
-                //@ts-ignore
-                fontSp.spriteFrame = this.wrongAnswerTipsType === 0 ? this.wrongAnswerTipsLabSpf1 : this.wrongAnswerTipsLabSpf2;
-                //@ts-ignore
-                boxSp.spriteFrame = this.wrongAnswerTipsSpf;
-            }
-            // cc.tween(tips).to(3, {opacity: 0}).call(()=>{
-            //     tips.destroy();
-            // }).start();
-        })
+        var fontSpf = null;
+        var boxSpf = null;
+        var tips = result ? this.correctTips : this.wrongTips;
+        if (result) {
+            //@ts-ignore
+            fontSpf = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
+            //@ts-ignore
+            boxSpf = this.correctionAnswerTipsSpf;
+        } else {
+            //@ts-ignore
+            fontSpf = this.wrongAnswerTipsType === 0 ? this.wrongAnswerTipsLabSpf1 : this.wrongAnswerTipsLabSpf2;
+            //@ts-ignore
+            boxSpf = this.wrongAnswerTipsSpf;
+        }
+        if (tips) {
+            tips.active = true;
+            tips.getComponent("Tips").updateView(fontSpf, boxSpf);
+        } else {
+            var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
+            //@ts-ignore
+            Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number)=>{
+                if (result) {
+                    this.correctTips = tips;
+                } else {
+                    this.wrongTips = tips;
+                }
+                tips.getComponent("Tips").updateView(fontSpf, boxSpf);
+            })
+        }
     }
 }

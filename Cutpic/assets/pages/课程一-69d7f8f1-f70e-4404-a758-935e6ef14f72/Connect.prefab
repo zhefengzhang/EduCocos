@@ -27,14 +27,11 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 259
-      },
-      {
-        "__id__": 260
+        "__id__": 257
       }
     ],
     "_prefab": {
-      "__id__": 261
+      "__id__": 258
     },
     "_opacity": 255,
     "_color": {
@@ -223,7 +220,7 @@
   {
     "__type__": "cc.Node",
     "_name": "connect",
-    "_objFlags": 1073741824,
+    "_objFlags": 0,
     "_parent": {
       "__id__": 1
     },
@@ -257,16 +254,10 @@
     "_components": [
       {
         "__id__": 255
-      },
-      {
-        "__id__": 256
-      },
-      {
-        "__id__": 257
       }
     ],
     "_prefab": {
-      "__id__": 258
+      "__id__": 256
     },
     "_opacity": 255,
     "_color": {
@@ -290,8 +281,8 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        960,
-        540,
+        0,
+        0,
         1000,
         0,
         0,
@@ -366,9 +357,9 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -1712.46,
-        -178.816,
-        -1000,
+        -801.993,
+        349.102,
+        0,
         0,
         0,
         0,
@@ -620,9 +611,9 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -1444,
-        -540,
-        -1000,
+        -533.533,
+        -12.082,
+        0,
         0,
         0,
         0,
@@ -2744,9 +2735,9 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -560,
-        -540,
-        -1000,
+        350.467,
+        -12.082,
+        0,
         0,
         0,
         0,
@@ -5284,9 +5275,9 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -960,
-        -540,
-        -1000,
+        -49.533,
+        -12.082,
+        0,
         0,
         0,
         0,
@@ -5371,9 +5362,9 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -125.007,
-        -982.913,
-        -1000,
+        785.46,
+        -454.995,
+        0,
         0,
         0,
         0,
@@ -5637,9 +5628,9 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -245.489,
-        -176.524,
-        -1000,
+        664.978,
+        351.394,
+        0,
         0,
         0,
         0,
@@ -6506,9 +6497,9 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -246.642,
-        -243.557,
-        -1000,
+        663.825,
+        284.361,
+        0,
         0,
         0,
         0,
@@ -7167,9 +7158,9 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        -970,
-        -114,
-        -1000,
+        -59.533,
+        413.918,
+        0,
         0,
         0,
         0,
@@ -7673,51 +7664,6 @@
     "sync": false
   },
   {
-    "__type__": "cc.Sprite",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 6
-    },
-    "_enabled": true,
-    "_materials": [
-      {
-        "__uuid__": "eca5d2f2-8ef6-41c2-bbe6-f9c79d09c432"
-      }
-    ],
-    "_srcBlendFactor": 770,
-    "_dstBlendFactor": 771,
-    "_spriteFrame": null,
-    "_type": 0,
-    "_sizeMode": 0,
-    "_fillType": 0,
-    "_fillCenter": {
-      "__type__": "cc.Vec2",
-      "x": 0,
-      "y": 0
-    },
-    "_fillStart": 0,
-    "_fillRange": 0,
-    "_isTrimmedMode": true,
-    "_atlas": null,
-    "_id": ""
-  },
-  {
-    "__type__": "4611daDn+RPZpDBWL4velTC",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 6
-    },
-    "_enabled": true,
-    "type": "page",
-    "bgSprite": {
-      "__id__": 3
-    },
-    "pageSwitch": 0,
-    "_id": ""
-  },
-  {
     "__type__": "51903T1AppHta/I91+oyJmz",
     "_name": "EduElementAbstract",
     "_objFlags": 0,
@@ -7804,6 +7750,9 @@
     "wrongTipsPrfb": {
       "__uuid__": "6b40469f-d7cb-4321-a1d1-ad4ed853bc33"
     },
+    "bgSprite": {
+      "__id__": 3
+    },
     "_id": ""
   },
   {
@@ -7818,38 +7767,8 @@
     "sync": false
   },
   {
-    "__type__": "cc.Sprite",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 1
-    },
-    "_enabled": true,
-    "_materials": [
-      {
-        "__uuid__": "eca5d2f2-8ef6-41c2-bbe6-f9c79d09c432"
-      }
-    ],
-    "_srcBlendFactor": 770,
-    "_dstBlendFactor": 771,
-    "_spriteFrame": null,
-    "_type": 0,
-    "_sizeMode": 0,
-    "_fillType": 0,
-    "_fillCenter": {
-      "__type__": "cc.Vec2",
-      "x": 0,
-      "y": 0
-    },
-    "_fillStart": 0,
-    "_fillRange": 0,
-    "_isTrimmedMode": true,
-    "_atlas": null,
-    "_id": ""
-  },
-  {
     "__type__": "4611daDn+RPZpDBWL4velTC",
-    "_name": "",
+    "_name": "EduElementAbstract",
     "_objFlags": 0,
     "node": {
       "__id__": 1

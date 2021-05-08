@@ -6,6 +6,7 @@ import EduElementAbstract from "EduElementAbstract";
 
 import GEnum from "../GameEnum";
 import Utils from "../Utils";
+import ConnectData from "./ConnectData";
 
 //@ts-ignore
 const { ccclass, property, menu } = cc._decorator;
@@ -226,6 +227,27 @@ export default class ConnectGame extends EduElementAbstract {
     wrongTipsPrfb: cc.Prefab = null;
     //#endregion
 
+    //#region 背景图片
+    @property(cc.Sprite)
+    bgSprite: cc.Sprite = null;
+
+    @property({type: cc.SpriteFrame})
+    @eduProperty({displayName: "设置背景图片"})
+    get bg() {
+        if (this.bgSprite && this.bgSprite.spriteFrame) {
+            return this.bgSprite.spriteFrame;
+        } else {
+            return null;
+        }
+    }
+
+    set bg(value) {
+        if (this.bgSprite) {
+            this.bgSprite.spriteFrame = value;
+        }
+    }
+    //#endregion
+
     //#endregion
     //#region 能否拖动
     //  @property
@@ -258,6 +280,8 @@ export default class ConnectGame extends EduElementAbstract {
     
     onLoad() {
         ConnectGame.ConnectGameMgr = this;
+        //@ts-ignore
+        ConnectData.gameParent = this.node;
     }
     start() {
         // this.AnswerContent.getComponent(cc.Layout).enabled = true;
@@ -455,6 +479,8 @@ export default class ConnectGame extends EduElementAbstract {
             this._rightNode.getChildByName('pic').active = false;
             this._leftNode.getChildByName('pic').active = false;
             Utils.printLog("回答错误", true);
+            this.openTips(false);
+
             this.resetData();
 
             return;
@@ -467,7 +493,7 @@ export default class ConnectGame extends EduElementAbstract {
         let lineNode = cc.instantiate(this.lineNode);
         if (flag) {
             Utils.printLog("回答正确", true);
-
+            this.openTips(true);
             this.checkFinish();
         }
         lineNode.color = this._rightLineColor; //flag ? this._rightLineColor : this._wrongLineColor;
@@ -573,9 +599,8 @@ export default class ConnectGame extends EduElementAbstract {
         var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
         //@ts-ignore
         Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number) => {
-            this.tips = tips;
-            var fontSp = this.tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
-            var boxSp = this.tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
+            var fontSp = tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
+            var boxSp = tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
             if (result) {
                 //@ts-ignore
                 fontSp.spriteFrame = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
@@ -587,8 +612,8 @@ export default class ConnectGame extends EduElementAbstract {
                 //@ts-ignore
                 boxSp.spriteFrame = this.wrongAnswerTipsSpf;
             }
-            cc.tween(this.tips).to(3, { opacity: 0 }).call(() => {
-                this.tips.destroy();
+            cc.tween(tips).to(1, { opacity: 0 }).call(() => {
+                tips.destroy();
             }).start();
         })
     }

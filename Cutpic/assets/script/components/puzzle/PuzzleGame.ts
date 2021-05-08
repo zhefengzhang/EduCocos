@@ -146,11 +146,28 @@ export default class PuzzleGame extends EduElementAbstract {
 
     @property({ type: cc.Prefab })
     correctTipsPrfb: cc.Prefab = null;
-
-    @property({ type: cc.Prefab })
-    wrongTipsPrfb: cc.Prefab = null;
     //#endregion
 
+    //#region 背景图片
+    @property(cc.Sprite)
+    bgSprite: cc.Sprite = null;
+
+    @property({type: cc.SpriteFrame})
+    @eduProperty({displayName: "设置背景图片"})
+    get bg() {
+        if (this.bgSprite && this.bgSprite.spriteFrame) {
+            return this.bgSprite.spriteFrame;
+        } else {
+            return null;
+        }
+    }
+
+    set bg(value) {
+        if (this.bgSprite) {
+            this.bgSprite.spriteFrame = value;
+        }
+    }
+    //#endregion
 
     // //#region 切图开关
     // @property
@@ -416,13 +433,14 @@ export default class PuzzleGame extends EduElementAbstract {
         let self = this;
         // console.log(pos.x, pos.y, ">>>>confirmPos", this._posData)
         let _isTrue = false;
+       
+        let nodeCom = node.getComponent('PicNum');
+        let picNum = nodeCom.num;
+        let parentIndex = nodeCom.parentIndex;
         for (let index = 0; index < this._posData.length; index++) {
             const element = this._posData[index];
             let boxCom = self.container.children[index].getComponent('BoxState');
             let boxNum = boxCom._boxNum;
-            let nodeCom = node.getComponent('PicNum');
-            let picNum = nodeCom.num;
-            let parentIndex = nodeCom.parentIndex;
 
             // console.log(boxNum, '>>boxNum>>', picNum)
             // self.container.children[index].color = new cc.Color(255, 255, 255, 255);
@@ -433,15 +451,15 @@ export default class PuzzleGame extends EduElementAbstract {
                 // && boxCom._isHave == false) {
                 //调换位置
                 let child = self.container.children[index].children;
-                console.log(boxCom._isHave,'isHave');
-                
-                if (boxCom._isHave && parentIndex!=null ) {
+                console.log(boxCom._isHave,'isHave',parentIndex);
+                if ( parentIndex!=null ) {
                     for (let k = 0; k < child.length; k++) {
                         let ele = child[k].getComponent('PicNum');
-                        if (ele && ele.parentIndex) {
+                        if (ele && ele.parentIndex !=null) {
                             // ele.node.parent = self.container.children[parentIndex];
                             console.log(self.container.children[parentIndex], parentIndex, '???parentin')
                             // self.container.children[parentIndex].color = cc.Color.RED;
+                            
                             ele.node.parent = null;
                             self.container.children[parentIndex].addChild(ele.node);
                             self.container.children[parentIndex].getComponent('BoxState')._isHave = true;
@@ -452,6 +470,7 @@ export default class PuzzleGame extends EduElementAbstract {
                             if (boxNum == ele.num) {
                                 ele.node.getComponent('PicNum')._isCorrect = true;
                             }
+
                             break;
                         }
                     }
@@ -464,14 +483,14 @@ export default class PuzzleGame extends EduElementAbstract {
                 if (boxCom._isHave && !PuzzleData.layoutNull) {
                     for (let k = 0; k < child.length; k++) {
                         let ele = child[k].getComponent('PicNum');
-                        console.log(ele, '>>>>>111111')
+                        // console.log(ele, '>>>>>111111')
                         if (ele ) {
                             if(ele.parentIndex==null || node.getComponent('PicNum').parentIndex == null){
                                 ele.node.parent = null;
                                 self.layoutNode.addChild(ele.node);
                                 self.layoutNode.getComponent(cc.Layout).enabled = true;
                                 ele.init();
-                                console.log(self.layoutNode, '>>>>>layoutNode')
+                                // console.log(self.layoutNode, '>>>>>layoutNode')
 
                             }
                             
@@ -495,12 +514,13 @@ export default class PuzzleGame extends EduElementAbstract {
         }
 
         if (_isTrue) {
-            Utils.printLog("回答正确", true);
-
+            // Utils.printLog("回答正确", true);
+            this.openTips(true);
         } else {
             node.parent = self.layoutNode;
             self.layoutNode.getComponent(cc.Layout).enabled = true;
-            Utils.printLog("回答错误", true);
+            // Utils.printLog("回答错误", true);
+            this.openTips(false);
 
         }
     }
@@ -546,9 +566,8 @@ export default class PuzzleGame extends EduElementAbstract {
         var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
         //@ts-ignore
         Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number) => {
-            this.tips = tips;
-            var fontSp = this.tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
-            var boxSp = this.tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
+            var fontSp = tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
+            var boxSp = tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
             if (result) {
                 //@ts-ignore
                 fontSp.spriteFrame = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
@@ -560,8 +579,8 @@ export default class PuzzleGame extends EduElementAbstract {
                 //@ts-ignore
                 boxSp.spriteFrame = this.wrongAnswerTipsSpf;
             }
-            cc.tween(this.tips).to(3, { opacity: 0 }).call(() => {
-                this.tips.destroy();
+            cc.tween(tips).to(1, { opacity: 0 }).call(() => {
+                tips.destroy();
             }).start();
         })
     }
