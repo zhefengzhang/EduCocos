@@ -5,6 +5,7 @@ import { eduProperty, syncNum, i18n } from "education";
 import EduElementAbstract from "EduElementAbstract";
 
 import Utils from "../Utils";
+import GEnum from "../GameEnum"
 
 //@ts-ignore
 const {ccclass, property, menu} = cc._decorator;
@@ -112,26 +113,52 @@ export default class FillIn extends EduElementAbstract {
     numKeyboard: cc.Node = null;
     //#endregion
 
+    //#region 弹窗
+    @property({type: GEnum.correctAnswerTipsType})
+    @eduProperty({displayName: "回答正确的弹窗文字"})
+    correctAnswerTipsType = GEnum.correctAnswerTipsType.答对了;
+
+    @property(cc.SpriteFrame)
+    correctAnswerTipsLabSpf1: cc.SpriteFrame = null;
+
+    @property(cc.SpriteFrame)
+    correctAnswerTipsLabSpf2: cc.SpriteFrame = null;
+
+    @property({type: GEnum.wrongAnswerTipsType})
+    @eduProperty({displayName: "回答错误的弹窗文字"})
+    wrongAnswerTipsType = GEnum.wrongAnswerTipsType.答错了;
+
+    @property(cc.SpriteFrame)
+    wrongAnswerTipsLabSpf1: cc.SpriteFrame = null;
+
+    @property(cc.SpriteFrame)
+    wrongAnswerTipsLabSpf2: cc.SpriteFrame = null;
+
+    @property({type: cc.SpriteFrame})
+    @eduProperty({displayName: "回答正确的弹窗图片"})
+    correctionAnswerTipsSpf: cc.SpriteFrame = null;
+
+    @property({type: cc.SpriteFrame})
+    @eduProperty({displayName: "回答错误的弹窗图片"})
+    wrongAnswerTipsSpf: cc.SpriteFrame = null;
+
+    @property({type: cc.Prefab})
+    correctTipsPrfb: cc.Prefab = null;
+
+    @property({type: cc.Prefab})
+    wrongTipsPrfb: cc.Prefab = null;
+
+    @property({type: cc.Prefab})
+    timeComing: cc.Prefab = null;
+
+    tips: cc.Node = null;
+    //#endregion
+
     /**
      * @zh 组件初始化
      */
     onLoad() {
         FillIn.fillInMgr = this;
-    }
-
-    /**
-     * @zh 开始游戏
-     */
-    start () {
-        this.addEventListeners();
-    }
-
-    /**
-     * @zh 开启监听事件
-     */
-    addEventListeners () {
-        //@ts-ignore
-        this.node.on(cc.Node.EventType.TOUCH_START, this.onBlankAreaTouched, this);
     }
 
     /**
@@ -143,16 +170,6 @@ export default class FillIn extends EduElementAbstract {
             Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, this.numKeyboardPrfb, (keyboard: cc.Node, i: number)=>{
                 this.numKeyboard = keyboard;
             })
-        }
-    }
-
-    /**
-     * @zh 页面空白区域点击
-     */
-    onBlankAreaTouched () {
-        if (this.numKeyboard) {
-            this.numKeyboard.destroy();
-            this.numKeyboard = null;
         }
     }
 
@@ -178,9 +195,36 @@ export default class FillIn extends EduElementAbstract {
      * @zh 更新题干
      */
     updateQuestion (stoneNum?, putInStoneNum?, answerNum?) {
-        if (!stoneNum) stoneNum = this.stoneCount;
-        if (!putInStoneNum) putInStoneNum = this.putInTimes;
-        if (!answerNum) answerNum = "____";
+        if (!stoneNum || stoneNum === "") stoneNum = this.stoneCount;
+        if (!putInStoneNum || putInStoneNum === "") putInStoneNum = this.putInTimes;
+        if (!answerNum || answerNum === "") answerNum = "____";
         this.questionLab.string = `瓶子里原来有${stoneNum}颗石头，乌鸦又叼了${putInStoneNum}颗放进去，请问现在瓶子里有${answerNum}颗石头？`;;
+    }
+
+    /**
+     * @zh 打开 tips 弹窗
+     */
+    openTips (result) {
+        var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
+        //@ts-ignore
+        Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number)=>{
+            this.tips = tips;
+            var fontSp = this.tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
+            var boxSp = this.tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
+            if (result) {
+                //@ts-ignore
+                fontSp.spriteFrame = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
+                //@ts-ignore
+                boxSp.spriteFrame = this.wrongAnswerTipsType;
+            } else {
+                //@ts-ignore
+                fontSp.spriteFrame = this.wrongAnswerTipsType === 0 ? this.wrongAnswerTipsLabSpf1 : this.wrongAnswerTipsLabSpf2;
+                //@ts-ignore
+                boxSp.spriteFrame = this.wrongAnswerTipsSpf;
+            }
+            cc.tween(this.tips).to(3, {opacity: 0}).call(()=>{
+                this.tips.destroy();
+            }).start();
+        })
     }
 }
