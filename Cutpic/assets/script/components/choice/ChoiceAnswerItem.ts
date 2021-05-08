@@ -3,9 +3,9 @@ declare var cc: any;
 import { eduProperty, i18n } from "education";
 
 import Choice from "./ChoiceMgr"
-import GMgr from "../GameMgr";
 import GData from "../GameData";
 import Utils from "../Utils";
+import Round from "../Round";
 //@ts-ignore
 import EduElementAbstract from "EduElementAbstract";
 
@@ -38,12 +38,6 @@ export default class NewClass extends EduElementAbstract {
 
     @property(cc.SpriteFrame)
     fruits: Array<cc.SpriteFrame> = [];
-
-    @property(cc.SpriteFrame)
-    noStartReward: cc.SpriteFrame = null;
-
-    @property(cc.SpriteFrame)
-    startReward: cc.SpriteFrame = null;
     //#endregion
 
     /**
@@ -67,16 +61,7 @@ export default class NewClass extends EduElementAbstract {
             Utils.printLog("回答正确", true);
             _selfComp.result.spriteFrame = this.correct;
             Choice.choiceMgr.openTips(true);
-            for (let i = 0; i < GData.roundNow; i++) {   
-                var _sp =  GMgr.gameMgr.starReward.children[i].getComponent(cc.Sprite);
-                if (_sp) {
-                    //@ts-ignore
-                    if (_sp.spriteFrame !== this.startReward) {
-                        //@ts-ignore
-                        _sp.spriteFrame = this.startReward;
-                    }
-                }
-            }
+            Round.roundMgr.updateStarReward();
         } else {
             Utils.printLog("回答错误", true);
             _selfComp.result.spriteFrame = this.wrong;
