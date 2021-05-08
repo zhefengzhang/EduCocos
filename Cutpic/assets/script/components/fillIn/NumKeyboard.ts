@@ -10,7 +10,7 @@ const {ccclass, property} = cc._decorator;
 import FillIn from "./FillInMgr";
 import Utils from "../Utils";
 import GData from "../GameData";
-import GMgr from "../GameMgr";
+import Round from "../Round";
 
 @ccclass
 export default class NewClass extends cc.Component {
@@ -24,6 +24,14 @@ export default class NewClass extends cc.Component {
     @property(cc.SpriteFrame)
     startReward: cc.SpriteFrame = null;
     //#endregion
+
+    /**
+     * @zh 激活 widget 组件调整节点位置
+     */
+    widgetActive () {
+        var widgetComp = this.node.getComponent(cc.Widget);
+        widgetComp.enabled = true;
+    }
 
     onNumKeyboardTouch (event, eventData: string) {
         var fillInMgr = FillIn.fillInMgr;
@@ -49,24 +57,13 @@ export default class NewClass extends cc.Component {
         if (this.resultNumString === FillIn.fillInMgr.correctAnswerNumber.toString()) {
             Utils.printLog("回答正确", true);
                 FillIn.fillInMgr.openTips(true);
-                for (let i = 0; i < GData.roundNow; i++) {   
-                    var _sp =  GMgr.gameMgr.starReward.children[i].getComponent(cc.Sprite);
-                    if (_sp) {
-                        //@ts-ignore
-                        if (_sp.spriteFrame !== this.startReward) {
-                            //@ts-ignore
-                            _sp.spriteFrame = this.startReward;
-                            this.node.destroy();
-                            FillIn.fillInMgr.numKeyboard = null;
-                            return;
-                        }
-                    }
-                }
+                Round.roundMgr.updateStarReward();
         } else {
             Utils.printLog("回答错误", true);
             FillIn.fillInMgr.openTips(false);
         }
-        this.node.destroy();
-        FillIn.fillInMgr.numKeyboard = null;
+        this.node.active = false;
+
+        FillIn.fillInMgr.animation.getComponent(cc.Animation).play();
     }
 }

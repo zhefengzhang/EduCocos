@@ -17,12 +17,11 @@ export default class FillIn extends EduElementAbstract {
     public static fillInMgr: FillIn = null;
 
     //#region 问题
-    questionTemp: string = `瓶子里原来有2颗石头，乌鸦又叼了2颗放进去，请问现在瓶子里有_______颗石头？`;
-
     @property(cc.Label)
     questionLab: cc.Label = null;
-
+    
     @property({type:cc.String, displayName: '问题描述', multiline:true})
+    // @eduProperty({displayName: "问题描述"})
     get question() {
         //@ts-ignore
         if (!this.questionLab) {
@@ -32,16 +31,47 @@ export default class FillIn extends EduElementAbstract {
         return this.questionLab.string;
     }
 
-    // set question(value) {
-    //     if (this.questionLab) {
-    //         this.questionLab.string = value;
-    //     }
-    // }
+    set question(value) {
+        if (this.questionLab) {
+            this.questionLab.string = value;
+        }
+    }
+
+    @property({type: cc.String})
+    @eduProperty({displayName: "存放石头的物体名"})
+    get storeStoneObjName() {
+        var firstIndex = this.question.indexOf("里");
+        return this.question.slice(0, firstIndex);
+    }
+    set storeStoneObjName(value) {
+        function insertStr(soure, start, newStr){   
+            return soure.slice(0, start) + newStr + soure.slice(start);
+        }
+
+        if (this.storeStoneObjName === "") {
+            this.question = insertStr(this.question, this.question.indexOf("里"), value);
+            this.question = insertStr(this.question, this.question.lastIndexOf("里"), value);
+        } else {
+            var re = new RegExp(this.storeStoneObjName, "g");
+            this.question = this.question.replace(re, value)
+        }
+    }
+
+    @property({type: cc.String})
+    @eduProperty({displayName: "投放石头的物体名"})
+    get dropStoneObjName() {
+        var firstIndex = this.question.indexOf("，");
+        var secondIndex = this.question.indexOf("又叼");
+        return this.question.slice(firstIndex + 1, secondIndex);
+    }
+    set dropStoneObjName(value) {
+        this.question = this.question.replace(this.storeStoneObjName, value)
+    }
 
     @property
     _stoneCount: number = 0;
-    @property({type: cc.Integer, displayName: '水杯石头数量', min: 0, step: 1})
-    @eduProperty({ displayName: '水杯石头数量' })
+    @property({type: cc.Integer, displayName: '石头数量', min: 0, step: 1})
+    @eduProperty({ displayName: '石头数量' })
     get stoneCount() {
         return this._stoneCount;
     }
@@ -60,8 +90,34 @@ export default class FillIn extends EduElementAbstract {
         }
     }
 
+    @property(cc.Prefab)
+    stoneItem: cc.Prefab = null;
+
     @property(cc.Node)
     stoneBox: cc.Node = null;
+    
+    @property
+    _putInTimes: number = 0;
+    @property({type: cc.Integer, min: 1, step: 1})
+    @eduProperty({displayName: "投放次数"})
+    get putInTimes() {
+        return this._putInTimes;
+    }
+    set putInTimes(value) {
+        if (value < 1) value = 1;
+        this._putInTimes = value;
+        this.updateQuestion(null, value)
+    }
+    //#endregion
+
+    //#region 水杯
+    @property
+    waterCenterMaxHeight: number = 0;
+
+    @property
+    waterUpdateHeightStep: number = 0;
+
+    waterTempHeight: number = 0;
 
     @property(cc.Node)
     waterTop: cc.Node = null;
@@ -71,19 +127,11 @@ export default class FillIn extends EduElementAbstract {
 
     @property(cc.Node)
     waterBottom: cc.Node = null;
+    //#endregion
 
-    @property
-    _putInTimes: number = 0;
-    @property({type: cc.Integer, min: 1, step: 1})
-    @eduProperty({displayName: "乌鸦投放次数"})
-    get putInTimes() {
-        return this._putInTimes;
-    }
-    set putInTimes(value) {
-        if (value < 1) value = 1;
-        this._putInTimes = value;
-        this.updateQuestion(null, value)
-    }
+    //#region 动画节点
+    @property(cc.Node)
+    animation: cc.Node = null;
     //#endregion
 
     //#region 答案
@@ -101,15 +149,8 @@ export default class FillIn extends EduElementAbstract {
     }
     //#endregion
 
-    //#region 预制体
-    @property(cc.Prefab)
-    stoneItem: cc.Prefab = null;
-
-    @property(cc.Prefab)
-    numKeyboardPrfb: cc.Prefab = null;
-    //#endregion
-
     //#region 数字键盘
+    @property(cc.Node)
     numKeyboard: cc.Node = null;
     //#endregion
 
@@ -159,36 +200,29 @@ export default class FillIn extends EduElementAbstract {
      */
     onLoad() {
         FillIn.fillInMgr = this;
+        this.waterTempHeight = this.waterCenter.height;
+    }
+
+    start () {
+        this.animation.getComponent("PutInStone").widgetActive();
+        this.numKeyboard.active = false;
     }
 
     /**
      * @zh 文本区域点击
      */
     onQuestionLabTouched (event) {
-        if (!this.numKeyboard) {
-            //@ts-ignore
-            Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, this.numKeyboardPrfb, (keyboard: cc.Node, i: number)=>{
-                this.numKeyboard = keyboard;
-            })
-        }
+        this.numKeyboard.active = true;
+        this.numKeyboard.getComponent("NumKeyboard").widgetActive();
     }
 
     /**
      * @zh 更新水位
      */
     updateWaterPosition () {
-        
-        var waterBottomHeight = this.waterBottom.height;
-        var waterCenterHeight = this.waterCenter.height;
-        //@ts-ignore
-        this.stoneBox.getComponent(cc.Layout).updateLayout();
-        var stoneBoxHeight = this.stoneBox.height;
-        if (this.stoneCount < 6) return;
-        if (stoneBoxHeight > waterBottomHeight + waterCenterHeight) {
-            this.waterCenter.height += stoneBoxHeight - waterBottomHeight - waterCenterHeight;
-        } else {
-            this.waterCenter.height += stoneBoxHeight - waterBottomHeight - waterCenterHeight;
-        }
+        if (this.waterCenter.height >= 176) return;
+        this.waterTempHeight += this.waterUpdateHeightStep;
+        cc.tween(this.waterCenter).to(1, {height: this.waterTempHeight}, {easing: "smooth"}).start();        
     }
 
     /**

@@ -6,7 +6,6 @@ import EduElementAbstract from "EduElementAbstract";
 
 import Utils from "../Utils";
 import GEnum from "../GameEnum";
-import GameMgr from "../GameMgr";
 
 //@ts-ignore
 const {ccclass, property, menu} = cc._decorator;

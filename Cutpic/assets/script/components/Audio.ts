@@ -35,4 +35,8 @@ export default class Audio extends EduElementAbstract {
     playBackgroundMusic () {
         if (this._bgAudio) cc.audioEngine.playMusic(this._bgAudio, true);
     }
+
+    start () {
+        // this.playBackgroundMusic();
+    }
 }
