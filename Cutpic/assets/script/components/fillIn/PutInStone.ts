@@ -29,15 +29,7 @@ export default class NewClass extends cc.Component {
     /**
      * @zh 滚动石头是否结束
      */
-     rockStoneFinish: boolean = false;
-
-    /**
-     * @zh 激活 widget 组件调整节点位置
-     */
-    widgetActive () {
-        var widgetComp = this.node.getComponent(cc.Widget);
-        widgetComp.enabled = true;
-    }
+    rockStoneFinish: boolean = false;
 
     /**
      * @zh 投放左边的石头
@@ -95,6 +87,9 @@ export default class NewClass extends cc.Component {
         var putInTimes = FillIn.fillInMgr._putInTimes;
         if (this.putInTimesNow >= putInTimes) {
             this.putInStoneAnim.stop();
+            if (FillIn.fillInMgr.resultNumString === FillIn.fillInMgr.correctAnswerNumber.toString()) {
+                FillIn.fillInMgr.openTips(true);
+            }
         }
     }
 }

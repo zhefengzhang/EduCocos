@@ -6,6 +6,7 @@ import { eduProperty, syncNum, i18n } from "education";
 import EduElementAbstract from "EduElementAbstract";
 
 import ConnectData from "./ConnectData";
+import ConnectGame from "./ConnectGame";
 
 //@ts-ignore
 const { ccclass, property, menu } = cc._decorator;
@@ -39,6 +40,7 @@ export default class QuestionItem extends cc.Component {
 
     // }
     clickQuesItem() {
+        if (ConnectGame.ConnectGameMgr.gameWin) return;
         if (this._status) {
             return;
         }

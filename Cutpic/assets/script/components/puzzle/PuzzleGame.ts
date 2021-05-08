@@ -5,13 +5,15 @@ import { eduProperty, syncNum, i18n } from "education";
 import EduElementAbstract from "EduElementAbstract";
 import Utils from "../Utils";
 import PuzzleData from "./PuzzleData";
+import Round from "../Round";
 import GEnum from "../GameEnum";
 //@ts-ignore
 const { ccclass, property, menu } = cc._decorator;
 @ccclass
 @menu("教育课件题型组件/拼图")
 export default class PuzzleGame extends EduElementAbstract {
-    
+    // public static puzzleGame: PuzzleGame = null;
+
     @property(cc.Label)
     questionLab: cc.Label = null;
 
@@ -38,6 +40,16 @@ export default class PuzzleGame extends EduElementAbstract {
     ImageNodeChanged: cc.Node = null;
     @property(cc.SpriteFrame)
     ImageNodeChangedSp: cc.SpriteFrame = null;
+    @property
+    _ImageNodeSp: cc.Sprite = null;
+    @property({ type: cc.Sprite})
+    get eduImageNodeSp() {
+        return this._ImageNodeSp;
+    }
+    set eduImageNodeSp(v) {
+        this._ImageNodeSp = v;
+        this.changeSp();
+    }
     @property({ type: cc.Node, displayName: '完成框' })
     finishNode: cc.Node = null;
     @property({ type: cc.Prefab, displayName: '右边切图小方块' })
@@ -149,6 +161,31 @@ export default class PuzzleGame extends EduElementAbstract {
 
     @property({ type: cc.Prefab })
     wrongTipsPrfb: cc.Prefab = null;
+        
+    correctTips: cc.Node = null;
+
+    wrongTips: cc.Node = null;
+    //#endregion
+
+    //#region 背景图片
+    @property(cc.Sprite)
+    bgSprite: cc.Sprite = null;
+
+    @property({type: cc.SpriteFrame})
+    @eduProperty({displayName: "设置背景图片"})
+    get bg() {
+        if (this.bgSprite && this.bgSprite.spriteFrame) {
+            return this.bgSprite.spriteFrame;
+        } else {
+            return null;
+        }
+    }
+
+    set bg(value) {
+        if (this.bgSprite) {
+            this.bgSprite.spriteFrame = value;
+        }
+    }
     //#endregion
 
 
@@ -178,6 +215,11 @@ export default class PuzzleGame extends EduElementAbstract {
     cellWidth = 0;
     cellHeight = 0;
     _finishNum = 0;
+
+    // onLoad(){
+    //     PuzzleGame.puzzleGame = this;
+    // }
+
     start() {
         if (!CC_EDITOR) { //运行时需要延迟一帧
             //@ts-ignore
@@ -204,9 +246,20 @@ export default class PuzzleGame extends EduElementAbstract {
         }
         return arr;
     }
+    changeSp(){
+        // let tempSp = new cc.SpriteFrame();
+        //@ts-ignore
+        // tempSp.setTexture(this.ImageNodeChanged.getComponent(cc.Sprite).spriteFrame._texture);
+        //@ts-ignore
+        this.imageNode.getComponent(cc.Sprite).spriteFrame = this.ImageNodeChanged.getComponent(cc.Sprite).spriteFrame;
+        if(!CC_EDITOR){
+            //@ts-ignore
+            this.ImageNodeChanged.getComponent(cc.Sprite).spriteFrame = this.ImageNodeChangedSp;
 
+        }
+    }
     //将图片分割，切图，初始化数据
-    cutPic() {
+   public cutPic() {
         let self = this;
         self.layoutNode.destroyAllChildren();
         if (this._cutState) {
@@ -241,9 +294,9 @@ export default class PuzzleGame extends EduElementAbstract {
         // let cellWidth = totalWidth / this.horNum;
         // let cellHeight = totalHeight / this.verNum;
         //@ts-ignore
-        layoutCom.cellSize.width = this.cellWidth - 30;
+        layoutCom.cellSize.width = this.cellWidth - 0;
         //@ts-ignore
-        layoutCom.cellSize.height = this.cellHeight - 30;
+        layoutCom.cellSize.height = this.cellHeight - 0;
         for (let i = 0; i < this._verNum; i++) {
             for (let k = 0; k < this._horNum; k++) {
                 const item = new cc.Node();
@@ -498,12 +551,12 @@ export default class PuzzleGame extends EduElementAbstract {
 
         if (_isTrue) {
             // Utils.printLog("回答正确", true);
-            this.openTips(true);
+            // this.openTips(true);
         } else {
             node.parent = self.layoutNode;
             self.layoutNode.getComponent(cc.Layout).enabled = true;
             // Utils.printLog("回答错误", true);
-            this.openTips(false);
+            // this.openTips(false);
 
         }
     }
@@ -539,32 +592,45 @@ export default class PuzzleGame extends EduElementAbstract {
             console.log('完成拼图');
             self.finishNode.active = true;
             PuzzleData.finishGame = true;
+            this.openTips(true);
+            Round.roundMgr.updateStarReward();
+
         }
         console.log(finishNum, '>>>>finishNum')
     }
+
     /**
      * @zh 打开 tips 弹窗
      */
-    openTips(result) {
-        var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
-        //@ts-ignore
-        Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number) => {
-            var fontSp = tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
-            var boxSp = tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
-            if (result) {
-                //@ts-ignore
-                fontSp.spriteFrame = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
-                //@ts-ignore
-                boxSp.spriteFrame = this.wrongAnswerTipsType;
-            } else {
-                //@ts-ignore
-                fontSp.spriteFrame = this.wrongAnswerTipsType === 0 ? this.wrongAnswerTipsLabSpf1 : this.wrongAnswerTipsLabSpf2;
-                //@ts-ignore
-                boxSp.spriteFrame = this.wrongAnswerTipsSpf;
-            }
-            cc.tween(tips).to(1, { opacity: 0 }).call(() => {
-                tips.destroy();
-            }).start();
-        })
+    openTips (result) {
+        var fontSpf = null;
+        var boxSpf = null;
+        var tips = result ? this.correctTips : this.wrongTips;
+        if (result) {
+            //@ts-ignore
+            fontSpf = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
+            //@ts-ignore
+            boxSpf = this.correctionAnswerTipsSpf;
+        } else {
+            //@ts-ignore
+            fontSpf = this.wrongAnswerTipsType === 0 ? this.wrongAnswerTipsLabSpf1 : this.wrongAnswerTipsLabSpf2;
+            //@ts-ignore
+            boxSpf = this.wrongAnswerTipsSpf;
+        }
+        if (tips) {
+            tips.active = true;
+            tips.getComponent("Tips").updateView(fontSpf, boxSpf);
+        } else {
+            var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
+            //@ts-ignore
+            Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number)=>{
+                if (result) {
+                    this.correctTips = tips;
+                } else {
+                    this.wrongTips = tips;
+                }
+                tips.getComponent("Tips").updateView(fontSpf, boxSpf);
+            })
+        }
     }
 }

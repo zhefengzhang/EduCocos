@@ -22,7 +22,7 @@ export default class Round extends EduElementAbstract {
 
     //#region 关卡
     @property
-    _roundCount: number = 0;
+    _roundCount: number = 1;
     @property({type: cc.Integer, min: 1, step: 1})
     @eduProperty({displayName: "关卡数量"})
     get roundCount() {
@@ -32,7 +32,18 @@ export default class Round extends EduElementAbstract {
         this.updateRoundStartNum(value);
     }
 
-    roundNow: number = 0;
+    @property
+    _roundNow: number = 1;
+    @property({type: cc.Integer, min: 1, step: 1})
+    @eduProperty({displayName: "当前关卡"})
+    get roundNow() {
+        return this._roundNow;
+    }
+    set roundNow(value) {
+        if (value > this._roundCount) value = this._roundCount;
+        if (value < 1) value = 1;
+        this._roundNow = value;
+    }
     //#endregion
 
     //#region 奖励
@@ -55,8 +66,7 @@ export default class Round extends EduElementAbstract {
 
     start () {
         //@ts-ignore
-        this.roundNow = window.roundNow;
-        for (let i = 0; i < this.roundNow; i++) {   
+        for (let i = 0; i < this.roundNow - 1; i++) {   
             var _sp =  this.starReward.children[i].getComponent(cc.Sprite);
             if (_sp) {
                 //@ts-ignore
@@ -66,8 +76,6 @@ export default class Round extends EduElementAbstract {
                 }
             }
         }
-        //@ts-ignore
-        if (window.roundNow < this._roundCount) window.roundNow++;
     }
 
     /**
@@ -104,7 +112,7 @@ export default class Round extends EduElementAbstract {
     updateRoundStartNum (value) {
         if (value < 1) value = 1;
         this._roundCount = value;
-        this.loadAnyNumPrefab(value, this.starReward, this.starReward.children[0], (startItem: cc.Node, i: number)=>{
+        this.loadAnyNumPrefab(value, this.starReward, this.startRewardPfb, (startItem: cc.Node, i: number)=>{
             let lastNode = this.starReward.children[i - 1];
             if (lastNode) {
                 startItem.x = lastNode.x + lastNode.width;
@@ -116,8 +124,7 @@ export default class Round extends EduElementAbstract {
      * @zh 更新星星奖励
      */
     updateStarReward () {
-        //@ts-ignore
-        for (let i = 0; i < window.roundNow; i++) {   
+        for (let i = 0; i < this._roundNow; i++) {   
             var _sp =  this.starReward.children[i].getComponent(cc.Sprite);
             if (_sp) {
                 //@ts-ignore

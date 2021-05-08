@@ -14,8 +14,6 @@ import Round from "../Round";
 @ccclass
 export default class NewClass extends cc.Component {
 
-    resultNumString: string = "";
-
     //#region 奖励
     @property(cc.SpriteFrame)
     noStartReward: cc.SpriteFrame = null;
@@ -25,10 +23,10 @@ export default class NewClass extends cc.Component {
     //#endregion
 
     onNumKeyboardTouch (event, eventData: string) {
-        this.resultNumString = "";
+        FillIn.fillInMgr.resultNumString = "";
         var fillInMgr = FillIn.fillInMgr;
-        this.resultNumString += eventData;
-        fillInMgr.updateQuestion(null, null, this.resultNumString);
+        FillIn.fillInMgr.resultNumString += eventData;
+        fillInMgr.updateQuestion(null, null, FillIn.fillInMgr.resultNumString);
         this.onCommit();
     }
 
@@ -36,11 +34,11 @@ export default class NewClass extends cc.Component {
      * @zh 提交
      */
     onCommit () {
-        if (this.resultNumString === FillIn.fillInMgr.correctAnswerNumber.toString()) {
+        if (FillIn.fillInMgr.resultNumString === FillIn.fillInMgr.correctAnswerNumber.toString()) {
             Utils.printLog("回答正确", true);
-            FillIn.fillInMgr.openTips(true);
-            FillIn.fillInMgr.animation.getComponent(cc.Animation).play();
+            FillIn.fillInMgr.animation.getComponent(cc.Animation).play("crowDrink");
             Round.roundMgr.updateStarReward();
+            FillIn.fillInMgr.gameWin = true;
             this.node.active = false;
         } else {
             Utils.printLog("回答错误", true);

@@ -52,7 +52,7 @@ export default class NewClass extends EduElementAbstract {
      * @zh 点击作答按钮的回调
      */
     onButtonCLicked (event: TouchEvent) {
-        if (Choice.choiceMgr._correctAnswerIndex === 0) return;
+        if (Choice.choiceMgr._correctAnswerIndex === 0 || Choice.choiceMgr.gameWin) return;
         //@ts-ignore
         var _selfComp =  event.target.getComponent("ChoiceAnswerItem");
         _selfComp.result.node.opacity = 255;
@@ -61,6 +61,7 @@ export default class NewClass extends EduElementAbstract {
             _selfComp.result.spriteFrame = this.correct;
             Choice.choiceMgr.openTips(true);
             Round.roundMgr.updateStarReward();
+            Choice.choiceMgr.gameWin = true;
         } else {
             Utils.printLog("回答错误", true);
             _selfComp.result.spriteFrame = this.wrong;
