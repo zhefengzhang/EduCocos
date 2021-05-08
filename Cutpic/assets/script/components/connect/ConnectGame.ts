@@ -16,7 +16,24 @@ export default class ConnectGame extends EduElementAbstract {
     public static ConnectGameMgr: ConnectGame = null;
 
     @property(cc.Label)
-    label: cc.Label = null;
+    questionLab: cc.Label = null;
+
+    @property({type:cc.String, displayName: '问题描述', multiline:true})
+    @eduProperty({displayName: '问题描述'})
+    get question() {
+        //@ts-ignore
+        if (!this.questionLab) {
+            //@ts-ignore
+            return "";
+        }
+        return this.questionLab.string;
+    }
+
+    set question(value) {
+        if (this.questionLab) {
+            this.questionLab.string = value;
+        }
+    }
 
     @property(cc.Prefab)
     Quesitem: cc.Prefab = null;
@@ -207,11 +224,6 @@ export default class ConnectGame extends EduElementAbstract {
 
     @property({ type: cc.Prefab })
     wrongTipsPrfb: cc.Prefab = null;
-
-    @property({ type: cc.Prefab })
-    timeComing: cc.Prefab = null;
-
-    tips: cc.Node = null;
     //#endregion
 
     //#endregion

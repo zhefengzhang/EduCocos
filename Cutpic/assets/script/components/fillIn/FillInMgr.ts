@@ -192,8 +192,6 @@ export default class FillIn extends EduElementAbstract {
 
     @property({type: cc.Prefab})
     wrongTipsPrfb: cc.Prefab = null;
-
-    tips: cc.Node = null;
     //#endregion
 
     /**

@@ -11,6 +11,26 @@ const { ccclass, property, menu } = cc._decorator;
 @ccclass
 @menu("教育课件题型组件/拼图")
 export default class PuzzleGame extends EduElementAbstract {
+    
+    @property(cc.Label)
+    questionLab: cc.Label = null;
+
+    @property({type:cc.String, displayName: '问题描述', multiline:true})
+    @eduProperty({displayName: '问题描述'})
+    get question() {
+        //@ts-ignore
+        if (!this.questionLab) {
+            //@ts-ignore
+            return "";
+        }
+        return this.questionLab.string;
+    }
+
+    set question(value) {
+        if (this.questionLab) {
+            this.questionLab.string = value;
+        }
+    }
 
     @property({ type: cc.Node, displayName: '显示图片' })
     imageNode: cc.Node = null;
@@ -129,11 +149,6 @@ export default class PuzzleGame extends EduElementAbstract {
 
     @property({ type: cc.Prefab })
     wrongTipsPrfb: cc.Prefab = null;
-
-    @property({ type: cc.Prefab })
-    timeComing: cc.Prefab = null;
-
-    tips: cc.Node = null;
     //#endregion
 
 
