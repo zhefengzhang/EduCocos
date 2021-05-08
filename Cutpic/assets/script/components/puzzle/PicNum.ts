@@ -6,16 +6,20 @@
 //  - https://docs.cocos.com/creator/manual/en/scripting/life-cycle-callbacks.html
 
 const { ccclass, property } = cc._decorator;
+import PuzzleData from "./PuzzleData";
 
 @ccclass
 export default class NewClass extends cc.Component {
 
     num = 0;
     _canMove = true;
-    _layoutIndex = 0;
     name = "";
     data = null;
     parentNode = null;
+    parentIndex = null;
+    _startMove = false;
+    _isCorrect = false;
+    _isMove = false;
     onEnable() {
         this.regisTouchEvent();
 
@@ -39,25 +43,35 @@ export default class NewClass extends cc.Component {
         this.node.off(cc.Node.EventType.TOUCH_END, this._onTouchEnd, this);
     }
     _onTouchStart(event) {
-        let e = event.getLocation();
-        console.log('e:', e);
-        if(this.node.parent.getComponent(cc.Layout)){
+        // let e = event.getLocation();
+        // console.log('e:', e);
+        if (this.node.parent.getComponent(cc.Layout)) {
             this.node.parent.getComponent(cc.Layout).enabled = false;
 
         }
+        if(this.node.parent.getComponent('BoxState')){
+            this.node.parent.getComponent('BoxState')._isHave = false;
+
+        }
+
 
     }
 
-    start(){
-        this.parentNode = this.node.parent.parent.parent.parent;
+    start() {
+        this.parentNode = PuzzleData.gameParent;
     }
     _onTouchMove(event) {
-        if (!this._canMove) {
-            return;
+        console.log(this._canMove,this._isCorrect,this._startMove,'}}}}')
+        // if (!this._canMove ){//&& this._isCorrect) {
+            // return;
+        // }
+        if (!this._startMove) {
+            this.node.parent = PuzzleData.moveParent;
         }
+        this._startMove = true;
         let localPos = event.getLocation();
         let pos = this.node.parent.convertToNodeSpaceAR(localPos);
-        console.log(pos.x, pos.y, 'e:', localPos.x, localPos.y);
+        // console.log(pos.x, pos.y, 'e:', localPos.x, localPos.y);
         this.node.setPosition(pos.x, pos.y);
         let gameCom = this.parentNode.getComponent('PuzzleGame');
         if (gameCom) {
@@ -70,13 +84,13 @@ export default class NewClass extends cc.Component {
     }
 
     _onTouchEnd(event) {
-        
+
         if (this.node.parent.getComponent(cc.Layout)) {
             this.node.parent.getComponent(cc.Layout).enabled = true;
-            
+
         }
         let localPos = event.getLocation();
-        
+
         let gameCom = this.parentNode.getComponent('PuzzleGame');
         if (gameCom) {
             this.parentNode.getComponent('PuzzleGame').confirmPos(this.node, localPos);

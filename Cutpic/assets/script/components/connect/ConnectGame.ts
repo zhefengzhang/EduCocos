@@ -4,6 +4,7 @@ import { eduProperty, syncNum, i18n } from "education";
 //@ts-ignore
 import EduElementAbstract from "EduElementAbstract";
 
+import GEnum from "../GameEnum";
 import Utils from "../Utils";
 
 //@ts-ignore
@@ -49,7 +50,7 @@ export default class ConnectGame extends EduElementAbstract {
     //#region 数据编辑
     @property//(cc.string)
     _leftData = '';
-    @property({ type: cc.string, displayName: '问题数据'})
+    @property({ type: cc.string, displayName: '问题数据' })
     @eduProperty({ displayName: '问题数据' })
     get eduLeftData() {
         return this._leftData;
@@ -62,7 +63,7 @@ export default class ConnectGame extends EduElementAbstract {
     //#region 数据编辑
     @property//(cc.string)
     _rightData = '';
-    @property({ type: cc.string, displayName: '答案数据'})
+    @property({ type: cc.string, displayName: '答案数据' })
     @eduProperty({ displayName: '答案数据' })
     get eduRightData() {
         return this._rightData;
@@ -72,9 +73,24 @@ export default class ConnectGame extends EduElementAbstract {
         this.creatAnswer();
 
     }
+
+    //#region 动画时间
+    @property
+    _aniTime = 0;
+    @property({ type: cc.Float, displayName: '动画时间', min: 0 })
+    @eduProperty({ displayName: '动画时间' })
+    get eduAniTime() {
+        return this._aniTime;
+    }
+    set eduAniTime(v) {
+        this._aniTime = v;
+
+    }
+    //#endregion
+
     //#region 答案数量
     @property
-    _answerNum = 0;
+    _answerNum = 1;
     @property({ type: cc.Integer, displayName: '答案数量', min: 0, step: 1 })
     @eduProperty({ displayName: '答案数量' })
     get eduAnswerCount() {
@@ -88,19 +104,19 @@ export default class ConnectGame extends EduElementAbstract {
     }
     //#endregion
 
-    //#region 方块间隔
+    // //#region 方块间隔
     @property
     _spaceY = 0;
-    @property({ type: cc.Integer, displayName: '间隔', min: 0, step: 1 })
-    @eduProperty({ displayName: '间隔' })
-    get eduSpace() {
-        return this._spaceY;
-    }
-    set eduSpace(v) {
-        this._spaceY = v;
-        this.setLayoutSpace();
-    }
-    //#endregion
+    // @property({ type: cc.Integer, displayName: '间隔', min: 0, step: 1 })
+    // @eduProperty({ displayName: '间隔' })
+    // get eduSpace() {
+    //     return this._spaceY;
+    // }
+    // set eduSpace(v) {
+    //     this._spaceY = v;
+    //     this.setLayoutSpace();
+    // }
+    // //#endregion
 
     //#region 正确颜色
     @property
@@ -140,6 +156,64 @@ export default class ConnectGame extends EduElementAbstract {
 
     @property(cc.SpriteFrame)
     picArray: Array<cc.SpriteFrame> = [];
+
+    @property
+    _finishNum = 0;
+    @property({ type: cc.Integer, displayName: '正确数量', min: 0, step: 1 })
+    @eduProperty({
+        displayName: '正确数量',
+    })
+    get edufinishNum() {
+        //@ts-ignore
+        return this._finishNum;
+    }
+    set edufinishNum(value) {
+        //@ts-ignore
+        this._finishNum = value;
+    }
+
+
+    //#region 弹窗
+    @property({ type: GEnum.correctAnswerTipsType })
+    @eduProperty({ displayName: "回答正确的弹窗文字" })
+    correctAnswerTipsType = GEnum.correctAnswerTipsType.答对了;
+
+    @property(cc.SpriteFrame)
+    correctAnswerTipsLabSpf1: cc.SpriteFrame = null;
+
+    @property(cc.SpriteFrame)
+    correctAnswerTipsLabSpf2: cc.SpriteFrame = null;
+
+    @property({ type: GEnum.wrongAnswerTipsType })
+    @eduProperty({ displayName: "回答错误的弹窗文字" })
+    wrongAnswerTipsType = GEnum.wrongAnswerTipsType.答错了;
+
+    @property(cc.SpriteFrame)
+    wrongAnswerTipsLabSpf1: cc.SpriteFrame = null;
+
+    @property(cc.SpriteFrame)
+    wrongAnswerTipsLabSpf2: cc.SpriteFrame = null;
+
+    @property({ type: cc.SpriteFrame })
+    @eduProperty({ displayName: "回答正确的弹窗图片" })
+    correctionAnswerTipsSpf: cc.SpriteFrame = null;
+
+    @property({ type: cc.SpriteFrame })
+    @eduProperty({ displayName: "回答错误的弹窗图片" })
+    wrongAnswerTipsSpf: cc.SpriteFrame = null;
+
+    @property({ type: cc.Prefab })
+    correctTipsPrfb: cc.Prefab = null;
+
+    @property({ type: cc.Prefab })
+    wrongTipsPrfb: cc.Prefab = null;
+
+    @property({ type: cc.Prefab })
+    timeComing: cc.Prefab = null;
+
+    tips: cc.Node = null;
+    //#endregion
+
     //#endregion
     //#region 能否拖动
     //  @property
@@ -167,6 +241,9 @@ export default class ConnectGame extends EduElementAbstract {
     _leftNode = null;
     _formLeftData = null;
     _formRightData = null;
+    _nowFinish = 0;
+    _startState = false;
+    
     onLoad() {
         ConnectGame.ConnectGameMgr = this;
     }
@@ -180,7 +257,7 @@ export default class ConnectGame extends EduElementAbstract {
         this.getRightData();
     }
 
-    getLeftData(){
+    getLeftData() {
         this._formLeftData = this._leftData.split(",");
         if (this._formLeftData.length != this._queNum) {
             this._formLeftData = this._leftData.split("，");
@@ -308,6 +385,7 @@ export default class ConnectGame extends EduElementAbstract {
         this._queserClick = true;
 
         if (this._answerClick) {
+            this._startState = true;
             this.drawLine(this._startPos, this._endPos);
 
         }
@@ -332,18 +410,20 @@ export default class ConnectGame extends EduElementAbstract {
         }
 
     }
-    changequeActive(){
+    changequeActive() {
         let children = this.QuesContent.children;
         for (let index = 0; index < children.length; index++) {
             const element = children[index];
-            element.getChildByName('pic').active = false;
+            element.getChildByName('pic').active = element.getComponent('QuestionItem')._status;
+
         }
     }
-    changeAnsActive(){
+    changeAnsActive() {
         let children = this.AnswerContent.children;
         for (let index = 0; index < children.length; index++) {
             const element = children[index];
-            element.getChildByName('pic').active = false;
+            element.getChildByName('pic').active = element.getComponent('AnswerItem')._status;
+
         }
     }
 
@@ -351,16 +431,19 @@ export default class ConnectGame extends EduElementAbstract {
         console.log(startPos.x, ">>>>", startPos.y);
         console.log(endPos.x, ">>>>", endPos.y)
         let flag = this.getAnswerStatu();
-        if(!flag){
-            
-            
+        let self = this;
+        if (!flag) {
             let tween = cc.tween()
-                            .repeat(5,
-                                cc.tween().to(0.1, { angle: 5 }).to(0.1, { angle: -5 })
-                            )
-                            .set({angle:0})
+                .repeat(5,
+                    cc.tween().to(0.1, { angle: 5 }).to(0.1, { angle: -5 })
+                )
+                .set({ angle: 0 })
             tween.clone(this._rightNode).start()
             tween.clone(this._leftNode).start()
+            this._rightNode.getChildByName('pic').active = false;
+            this._leftNode.getChildByName('pic').active = false;
+            Utils.printLog("回答错误", true);
+            this.resetData();
 
             return;
         }
@@ -370,11 +453,34 @@ export default class ConnectGame extends EduElementAbstract {
         let radian = Math.atan2(dtX, dtY);
         let rotation = (180 * radian / Math.PI + 90) % 360;
         let lineNode = cc.instantiate(this.lineNode);
-        lineNode.color = flag ? this._rightLineColor : this._wrongLineColor;
+        if (flag) {
+            Utils.printLog("回答正确", true);
+
+            this.checkFinish();
+        }
+        lineNode.color = this._rightLineColor; //flag ? this._rightLineColor : this._wrongLineColor;
         this.LineContent.addChild(lineNode);
-        lineNode.angle = -rotation;
-        lineNode.width = Math.sqrt(dtX * dtX + dtY * dtY);
-        lineNode.position = cc.v3(endPos.x, endPos.y, 0);
+        if (this._startState == false) {
+            lineNode.angle = -rotation + 180;
+            // lineNode.width = Math.sqrt(dtX * dtX + dtY * dtY);
+            lineNode.position = cc.v3(startPos.x, startPos.y, 0);
+        } else {
+            lineNode.angle = -rotation;
+            // lineNode.width = Math.sqrt(dtX * dtX + dtY * dtY);
+            lineNode.position = cc.v3(endPos.x, endPos.y, 0);
+        }
+        // lineNode.angle = -rotation + 180;
+        // lineNode.position = cc.v3(startPos.x, startPos.y, 0);
+        let tagetWidth = Math.sqrt(dtX * dtX + dtY * dtY);
+        cc.tween(lineNode)
+            .by(self._aniTime, tagetWidth, {
+                'onUpdate': (target, ratio) => {
+                    target.width = tagetWidth * ratio;
+                    console.log(ratio, '>>>ratio')
+                }
+            })
+            .start();
+
 
         this.changeStatus();
     }
@@ -403,6 +509,7 @@ export default class ConnectGame extends EduElementAbstract {
         this._answerClick = false;
         this._rightNode = null;
         this._leftNode = null;
+        this._startState == false;
     }
 
     changeStatus() {
@@ -428,7 +535,16 @@ export default class ConnectGame extends EduElementAbstract {
         this.resetData();
 
     }
+    //检查任务完成度
+    checkFinish() {
+        let self = this;
+        self._nowFinish += 1;
+        if (self._nowFinish == self._finishNum) {
+            console.log('完成连线');
 
+        }
+        console.log(self._finishNum, '>>>>finishNum')
+    }
     onEnable() {
         // this.regisTouchEvent();
     }
@@ -438,6 +554,31 @@ export default class ConnectGame extends EduElementAbstract {
     }
 
 
-
+    /**
+         * @zh 打开 tips 弹窗
+         */
+    openTips(result) {
+        var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
+        //@ts-ignore
+        Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number) => {
+            this.tips = tips;
+            var fontSp = this.tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
+            var boxSp = this.tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
+            if (result) {
+                //@ts-ignore
+                fontSp.spriteFrame = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
+                //@ts-ignore
+                boxSp.spriteFrame = this.wrongAnswerTipsType;
+            } else {
+                //@ts-ignore
+                fontSp.spriteFrame = this.wrongAnswerTipsType === 0 ? this.wrongAnswerTipsLabSpf1 : this.wrongAnswerTipsLabSpf2;
+                //@ts-ignore
+                boxSp.spriteFrame = this.wrongAnswerTipsSpf;
+            }
+            cc.tween(this.tips).to(3, { opacity: 0 }).call(() => {
+                this.tips.destroy();
+            }).start();
+        })
+    }
     // update (dt) {}
 }
