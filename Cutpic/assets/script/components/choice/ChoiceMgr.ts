@@ -109,12 +109,14 @@ export default class Choice extends EduElementAbstract {
     wrongAnswerTipsSpf: cc.SpriteFrame = null;
 
     @property({type: cc.Prefab})
-    tipsPrfb: cc.Prefab = null;
+    correctTipsPrfb: cc.Prefab = null;
 
-    @property(cc.Node)
+    @property({type: cc.Prefab})
+    wrongTipsPrfb: cc.Prefab = null;
+
     tips: cc.Node = null;
     //#endregion
-    
+
     /**
      * @zh 组件初始化
      */
@@ -125,22 +127,26 @@ export default class Choice extends EduElementAbstract {
     /**
      * @zh 打开 tips 弹窗
      */
-    openTips () {
-        if (!this.tips) {
-            //@ts-ignore
-            Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, this.tipsPrfb, (tips: cc.Node, i: number)=>{
-                this.tips = tips;
-            })
-        }
-    }
-
-        /**
-     * @zh 页面空白区域点击
-     */
-        onBlankAreaTouched () {
-        if (this.tips) {
-            this.tips.destroy();
-            this.tips = null;
-        }
+    openTips (result) {
+        var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
+        //@ts-ignore
+        Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number)=>{
+            var fontSp = tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
+            var boxSp = tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
+            if (result) {
+                //@ts-ignore
+                fontSp.spriteFrame = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
+                //@ts-ignore
+                boxSp.spriteFrame = this.wrongAnswerTipsType;
+            } else {
+                //@ts-ignore
+                fontSp.spriteFrame = this.wrongAnswerTipsType === 0 ? this.wrongAnswerTipsLabSpf1 : this.wrongAnswerTipsLabSpf2;
+                //@ts-ignore
+                boxSp.spriteFrame = this.wrongAnswerTipsSpf;
+            }
+            // cc.tween(tips).to(3, {opacity: 0}).call(()=>{
+            //     tips.destroy();
+            // }).start();
+        })
     }
 }
