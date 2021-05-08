@@ -6,6 +6,7 @@ import EduElementAbstract from "EduElementAbstract";
 
 import GEnum from "../GameEnum";
 import Utils from "../Utils";
+import ConnectData from "./ConnectData";
 
 //@ts-ignore
 const { ccclass, property, menu } = cc._decorator;
@@ -16,7 +17,24 @@ export default class ConnectGame extends EduElementAbstract {
     public static ConnectGameMgr: ConnectGame = null;
 
     @property(cc.Label)
-    label: cc.Label = null;
+    questionLab: cc.Label = null;
+
+    @property({type:cc.String, displayName: '问题描述', multiline:true})
+    @eduProperty({displayName: '问题描述'})
+    get question() {
+        //@ts-ignore
+        if (!this.questionLab) {
+            //@ts-ignore
+            return "";
+        }
+        return this.questionLab.string;
+    }
+
+    set question(value) {
+        if (this.questionLab) {
+            this.questionLab.string = value;
+        }
+    }
 
     @property(cc.Prefab)
     Quesitem: cc.Prefab = null;
@@ -207,11 +225,6 @@ export default class ConnectGame extends EduElementAbstract {
 
     @property({ type: cc.Prefab })
     wrongTipsPrfb: cc.Prefab = null;
-
-    @property({ type: cc.Prefab })
-    timeComing: cc.Prefab = null;
-
-    tips: cc.Node = null;
     //#endregion
 
     //#endregion
@@ -246,6 +259,8 @@ export default class ConnectGame extends EduElementAbstract {
     
     onLoad() {
         ConnectGame.ConnectGameMgr = this;
+        //@ts-ignore
+        ConnectData.gameParent = this.node;
     }
     start() {
         // this.AnswerContent.getComponent(cc.Layout).enabled = true;
@@ -443,6 +458,8 @@ export default class ConnectGame extends EduElementAbstract {
             this._rightNode.getChildByName('pic').active = false;
             this._leftNode.getChildByName('pic').active = false;
             Utils.printLog("回答错误", true);
+            this.openTips(false);
+
             this.resetData();
 
             return;
@@ -455,7 +472,7 @@ export default class ConnectGame extends EduElementAbstract {
         let lineNode = cc.instantiate(this.lineNode);
         if (flag) {
             Utils.printLog("回答正确", true);
-
+            this.openTips(true);
             this.checkFinish();
         }
         lineNode.color = this._rightLineColor; //flag ? this._rightLineColor : this._wrongLineColor;
@@ -561,9 +578,8 @@ export default class ConnectGame extends EduElementAbstract {
         var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
         //@ts-ignore
         Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number) => {
-            this.tips = tips;
-            var fontSp = this.tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
-            var boxSp = this.tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
+            var fontSp = tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
+            var boxSp = tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
             if (result) {
                 //@ts-ignore
                 fontSp.spriteFrame = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
@@ -575,9 +591,9 @@ export default class ConnectGame extends EduElementAbstract {
                 //@ts-ignore
                 boxSp.spriteFrame = this.wrongAnswerTipsSpf;
             }
-            cc.tween(this.tips).to(3, { opacity: 0 }).call(() => {
-                this.tips.destroy();
-            }).start();
+            // cc.tween(tips).to(3, { opacity: 0 }).call(() => {
+            //     tips.destroy();
+            // }).start();
         })
     }
     // update (dt) {}

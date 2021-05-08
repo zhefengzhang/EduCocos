@@ -11,6 +11,26 @@ const { ccclass, property, menu } = cc._decorator;
 @ccclass
 @menu("教育课件题型组件/拼图")
 export default class PuzzleGame extends EduElementAbstract {
+    
+    @property(cc.Label)
+    questionLab: cc.Label = null;
+
+    @property({type:cc.String, displayName: '问题描述', multiline:true})
+    @eduProperty({displayName: '问题描述'})
+    get question() {
+        //@ts-ignore
+        if (!this.questionLab) {
+            //@ts-ignore
+            return "";
+        }
+        return this.questionLab.string;
+    }
+
+    set question(value) {
+        if (this.questionLab) {
+            this.questionLab.string = value;
+        }
+    }
 
     @property({ type: cc.Node, displayName: '显示图片' })
     imageNode: cc.Node = null;
@@ -129,11 +149,6 @@ export default class PuzzleGame extends EduElementAbstract {
 
     @property({ type: cc.Prefab })
     wrongTipsPrfb: cc.Prefab = null;
-
-    @property({ type: cc.Prefab })
-    timeComing: cc.Prefab = null;
-
-    tips: cc.Node = null;
     //#endregion
 
 
@@ -480,12 +495,13 @@ export default class PuzzleGame extends EduElementAbstract {
         }
 
         if (_isTrue) {
-            Utils.printLog("回答正确", true);
-
+            // Utils.printLog("回答正确", true);
+            this.openTips(true);
         } else {
             node.parent = self.layoutNode;
             self.layoutNode.getComponent(cc.Layout).enabled = true;
-            Utils.printLog("回答错误", true);
+            // Utils.printLog("回答错误", true);
+            this.openTips(false);
 
         }
     }
@@ -531,9 +547,8 @@ export default class PuzzleGame extends EduElementAbstract {
         var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
         //@ts-ignore
         Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number) => {
-            this.tips = tips;
-            var fontSp = this.tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
-            var boxSp = this.tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
+            var fontSp = tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
+            var boxSp = tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
             if (result) {
                 //@ts-ignore
                 fontSp.spriteFrame = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
@@ -545,9 +560,9 @@ export default class PuzzleGame extends EduElementAbstract {
                 //@ts-ignore
                 boxSp.spriteFrame = this.wrongAnswerTipsSpf;
             }
-            cc.tween(this.tips).to(3, { opacity: 0 }).call(() => {
-                this.tips.destroy();
-            }).start();
+            // cc.tween(this.tips).to(3, { opacity: 0 }).call(() => {
+            //     this.tips.destroy();
+            // }).start();
         })
     }
 }

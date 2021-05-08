@@ -27,14 +27,11 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 194
-      },
-      {
-        "__id__": 195
+        "__id__": 196
       }
     ],
     "_prefab": {
-      "__id__": 196
+      "__id__": 197
     },
     "_opacity": 255,
     "_color": {
@@ -165,7 +162,9 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_spriteFrame": null,
+    "_spriteFrame": {
+      "__uuid__": "d30bfdd8-9611-44be-a0cf-f3e914cc99f3"
+    },
     "_type": 0,
     "_sizeMode": 0,
     "_fillType": 0,
@@ -249,10 +248,16 @@
     "_components": [
       {
         "__id__": 192
+      },
+      {
+        "__id__": 193
+      },
+      {
+        "__id__": 194
       }
     ],
     "_prefab": {
-      "__id__": 193
+      "__id__": 195
     },
     "_opacity": 255,
     "_color": {
@@ -1354,8 +1359,8 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_string": "00",
-    "_N$string": "00",
+    "_string": "15",
+    "_N$string": "15",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -1596,8 +1601,8 @@
     ],
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
-    "_string": "15",
-    "_N$string": "15",
+    "_string": "00",
+    "_N$string": "00",
     "_fontSize": 40,
     "_lineHeight": 40,
     "_enableWrapText": true,
@@ -5818,22 +5823,26 @@
     "_id": ""
   },
   {
-    "__type__": "cc.PrefabInfo",
-    "root": {
-      "__id__": 1
+    "__type__": "4611daDn+RPZpDBWL4velTC",
+    "_name": "EduElementAbstract",
+    "_objFlags": 0,
+    "node": {
+      "__id__": 6
     },
-    "asset": {
-      "__uuid__": "a42c068f-2d7d-4789-964b-fbf53f5551e4"
+    "_enabled": true,
+    "type": "page",
+    "bgSprite": {
+      "__id__": 3
     },
-    "fileId": "50AKod3nVJ1JxNBMR6sWtH",
-    "sync": false
+    "pageSwitch": 0,
+    "_id": ""
   },
   {
     "__type__": "cc.Sprite",
     "_name": "",
     "_objFlags": 0,
     "node": {
-      "__id__": 1
+      "__id__": 6
     },
     "_enabled": true,
     "_materials": [
@@ -5844,7 +5853,7 @@
     "_srcBlendFactor": 770,
     "_dstBlendFactor": 771,
     "_spriteFrame": null,
-    "_type": 0,
+    "_type": 1,
     "_sizeMode": 0,
     "_fillType": 0,
     "_fillCenter": {
@@ -5859,8 +5868,19 @@
     "_id": ""
   },
   {
+    "__type__": "cc.PrefabInfo",
+    "root": {
+      "__id__": 1
+    },
+    "asset": {
+      "__uuid__": "a42c068f-2d7d-4789-964b-fbf53f5551e4"
+    },
+    "fileId": "50AKod3nVJ1JxNBMR6sWtH",
+    "sync": false
+  },
+  {
     "__type__": "4611daDn+RPZpDBWL4velTC",
-    "_name": "",
+    "_name": "EduElementAbstract",
     "_objFlags": 0,
     "node": {
       "__id__": 1

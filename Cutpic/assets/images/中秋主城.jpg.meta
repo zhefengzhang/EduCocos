@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "a39f58c2-42f7-43db-9591-232120e58853",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 1920,
+  "height": 1080,
+  "platformSettings": {},
+  "subMetas": {
+    "中秋主城": {
+      "ver": "1.0.4",
+      "uuid": "df45be32-95e4-44d7-8333-7c20a67b52f3",
+      "rawTextureUuid": "a39f58c2-42f7-43db-9591-232120e58853",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 1920,
+      "height": 1080,
+      "rawWidth": 1920,
+      "rawHeight": 1080,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}
