@@ -24,15 +24,8 @@ export default class NewClass extends cc.Component {
     startReward: cc.SpriteFrame = null;
     //#endregion
 
-    /**
-     * @zh 激活 widget 组件调整节点位置
-     */
-    widgetActive () {
-        var widgetComp = this.node.getComponent(cc.Widget);
-        widgetComp.enabled = true;
-    }
-
     onNumKeyboardTouch (event, eventData: string) {
+        this.resultNumString = "";
         var fillInMgr = FillIn.fillInMgr;
         this.resultNumString += eventData;
         fillInMgr.updateQuestion(null, null, this.resultNumString);
@@ -48,10 +41,10 @@ export default class NewClass extends cc.Component {
             FillIn.fillInMgr.openTips(true);
             FillIn.fillInMgr.animation.getComponent(cc.Animation).play();
             Round.roundMgr.updateStarReward();
+            this.node.active = false;
         } else {
             Utils.printLog("回答错误", true);
             FillIn.fillInMgr.openTips(false);
         }
-        this.node.active = false;
     }
 }

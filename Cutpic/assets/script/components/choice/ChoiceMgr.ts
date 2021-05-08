@@ -131,9 +131,8 @@ export default class Choice extends EduElementAbstract {
         var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
         //@ts-ignore
         Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number)=>{
-            this.tips = tips;
-            var fontSp = this.tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
-            var boxSp = this.tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
+            var fontSp = tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
+            var boxSp = tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
             if (result) {
                 //@ts-ignore
                 fontSp.spriteFrame = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
@@ -145,9 +144,9 @@ export default class Choice extends EduElementAbstract {
                 //@ts-ignore
                 boxSp.spriteFrame = this.wrongAnswerTipsSpf;
             }
-            cc.tween(this.tips).to(3, {opacity: 0}).call(()=>{
-                this.tips.destroy();
-            }).start();
+            // cc.tween(tips).to(3, {opacity: 0}).call(()=>{
+            //     tips.destroy();
+            // }).start();
         })
     }
 }

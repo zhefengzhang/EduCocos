@@ -130,14 +130,13 @@ export default class Label extends EduElementAbstract {
             return;
         }
         if (this.countDownTimeSecond === 10) {
-            if (this.countDownTime) return;
             //@ts-ignore
             this.loadAnyNumPrefab(this.node.parent.childrenCount + 1, this.node.parent, this.countDownTimePrfb, (countDownTime: cc.Node, i: number)=>{
-                this.countDownTime = countDownTime;
-                cc.tween(this.countDownTime).to(3, {opacity: 0}).call(()=>{
-                    this.countDownTime.destroy();
-                    this.countDownTime = null;
-                }).start();
+                // this.countDownTime = countDownTime;
+                // cc.tween(this.countDownTime).to(3, {opacity: 0}).call(()=>{
+                //     this.countDownTime.destroy();
+                //     this.countDownTime = null;
+                // }).start();
             })
         }
         this.countDownTimeSecond = Number(this.countDownMinute) * 60 + Number(this.countDownSecond);

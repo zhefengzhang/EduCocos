@@ -10,6 +10,10 @@ import GEnum from "../GameEnum"
 //@ts-ignore
 const {ccclass, property, menu} = cc._decorator;
 
+function insertStr(soure, start, newStr){   
+    return soure.slice(0, start) + newStr + soure.slice(start);
+}
+
 @ccclass
 @menu("教育课件题型组件/填空题")
 export default class FillIn extends EduElementAbstract {
@@ -44,10 +48,6 @@ export default class FillIn extends EduElementAbstract {
         return this.question.slice(0, firstIndex);
     }
     set storeStoneObjName(value) {
-        function insertStr(soure, start, newStr){   
-            return soure.slice(0, start) + newStr + soure.slice(start);
-        }
-
         if (this.storeStoneObjName === "") {
             this.question = insertStr(this.question, this.question.indexOf("里"), value);
             this.question = insertStr(this.question, this.question.lastIndexOf("里"), value);
@@ -65,8 +65,16 @@ export default class FillIn extends EduElementAbstract {
         return this.question.slice(firstIndex + 1, secondIndex);
     }
     set dropStoneObjName(value) {
-        this.question = this.question.replace(this.storeStoneObjName, value)
+        if (this.dropStoneObjName === "") {
+            this.question = insertStr(this.question, this.question.lastIndexOf("又叼"), value);
+        } else {
+            var re = new RegExp(this.dropStoneObjName, "g");
+            this.question = this.question.replace(re, value)
+        }
     }
+
+    @property
+    stoneCountMax: number = 0;
 
     @property
     _stoneCount: number = 0;
@@ -76,7 +84,8 @@ export default class FillIn extends EduElementAbstract {
         return this._stoneCount;
     }
     set stoneCount(v) {
-        if (v < 1) v = 1;
+        if (v < 0) v = 0;
+        if (this.putInTimes + v > this.stoneCountMax) return;
         this._stoneCount = v;
         this.updateQuestion(v)
         if (this.stoneBox) {
@@ -104,7 +113,8 @@ export default class FillIn extends EduElementAbstract {
         return this._putInTimes;
     }
     set putInTimes(value) {
-        if (value < 1) value = 1;
+        if (value < 0) value = 0;
+        if (this.stoneCount + value > this.stoneCountMax) return;
         this._putInTimes = value;
         this.updateQuestion(null, value)
     }
@@ -194,8 +204,10 @@ export default class FillIn extends EduElementAbstract {
         this.waterTempHeight = this.waterCenter.height;
     }
 
+    /**
+     * @zh 游戏开始
+     */
     start () {
-        this.animation.getComponent("PutInStone").widgetActive();
         this.numKeyboard.active = false;
     }
 
@@ -204,7 +216,6 @@ export default class FillIn extends EduElementAbstract {
      */
     onQuestionLabTouched (event) {
         this.numKeyboard.active = true;
-        this.numKeyboard.getComponent("NumKeyboard").widgetActive();
     }
 
     /**
@@ -233,23 +244,22 @@ export default class FillIn extends EduElementAbstract {
         var tipsPrefab = result ? this.correctTipsPrfb : this.wrongTipsPrfb;
         //@ts-ignore
         Utils.loadAnyNumPrefab(this.node.childrenCount + 1, this.node, tipsPrefab, (tips: cc.Node, i: number)=>{
-            this.tips = tips;
-            var fontSp = this.tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
-            var boxSp = this.tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
+            var fontSp = tips.getChildByName("tipsBox03").getChildByName("tipsFont01").getComponent(cc.Sprite);
+            var boxSp = tips.getChildByName("tipsBox01").getComponent(cc.Sprite);
             if (result) {
                 //@ts-ignore
                 fontSp.spriteFrame = this.correctAnswerTipsType === 0 ? this.correctAnswerTipsLabSpf1 : this.correctAnswerTipsLabSpf2;
                 //@ts-ignore
-                boxSp.spriteFrame = this.wrongAnswerTipsType;
+                boxSp.spriteFrame = this.correctionAnswerTipsSpf;
             } else {
                 //@ts-ignore
                 fontSp.spriteFrame = this.wrongAnswerTipsType === 0 ? this.wrongAnswerTipsLabSpf1 : this.wrongAnswerTipsLabSpf2;
                 //@ts-ignore
                 boxSp.spriteFrame = this.wrongAnswerTipsSpf;
             }
-            cc.tween(this.tips).to(3, {opacity: 0}).call(()=>{
-                this.tips.destroy();
-            }).start();
+            // cc.tween(tips).to(3, {opacity: 0}).call(()=>{
+            //     tips.destroy();
+            // }).start();
         })
     }
 }
