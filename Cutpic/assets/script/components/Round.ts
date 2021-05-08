@@ -7,6 +7,8 @@
 declare var cc: any;
 //@ts-ignore
 import { eduProperty, syncNum, i18n } from "education";
+//@ts-ignore
+import EduElementAbstract from "EduElementAbstract";
 
 const {ccclass, property} = cc._decorator;
 
@@ -14,7 +16,7 @@ const {ccclass, property} = cc._decorator;
 window.roundNow = 0;
 
 @ccclass
-export default class Round extends cc.Component {
+export default class Round extends EduElementAbstract {
 
     public static roundMgr: Round = null;
 

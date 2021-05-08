@@ -276,7 +276,7 @@
       "__type__": "TypedArray",
       "ctor": "Float64Array",
       "array": [
-        0,
+        -2,
         0,
         0,
         0,
@@ -922,7 +922,7 @@
     "asset": {
       "__uuid__": "1f797ecc-3006-4a1f-8571-d81cbea87736"
     },
-    "fileId": "aapz0fpmNNwbmhiUe9YJmM",
+    "fileId": "22myWH/mFAWrQqLVNedX9w",
     "sync": false
   },
   {
@@ -1055,7 +1055,7 @@
     "asset": {
       "__uuid__": "1f797ecc-3006-4a1f-8571-d81cbea87736"
     },
-    "fileId": "cc1o30xxJA86svrNVad6er",
+    "fileId": "27MZ0PwItC5o3tQ1jG7yw5",
     "sync": false
   },
   {
