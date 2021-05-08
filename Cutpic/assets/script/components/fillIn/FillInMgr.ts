@@ -110,7 +110,7 @@ export default class FillIn extends EduElementAbstract {
     
     @property
     _putInTimes: number = 0;
-    @property({type: cc.Integer, min: 1, step: 1})
+    @property({type: cc.Integer, min: 0, step: 1})
     @eduProperty({displayName: "投放次数"})
     get putInTimes() {
         return this._putInTimes;
