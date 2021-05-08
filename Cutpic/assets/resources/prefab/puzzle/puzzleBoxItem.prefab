@@ -14,7 +14,7 @@
   {
     "__type__": "cc.Node",
     "_name": "puzzleBoxItem",
-    "_objFlags": 0,
+    "_objFlags": 512,
     "_parent": null,
     "_children": [],
     "_active": true,
