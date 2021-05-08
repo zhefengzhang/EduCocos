@@ -591,9 +591,9 @@ export default class ConnectGame extends EduElementAbstract {
                 //@ts-ignore
                 boxSp.spriteFrame = this.wrongAnswerTipsSpf;
             }
-            // cc.tween(tips).to(3, { opacity: 0 }).call(() => {
-            //     tips.destroy();
-            // }).start();
+            cc.tween(tips).to(1, { opacity: 0 }).call(() => {
+                tips.destroy();
+            }).start();
         })
     }
     // update (dt) {}
