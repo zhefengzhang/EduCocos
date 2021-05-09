@@ -1,0 +1,36 @@
+{
+  "ver": "2.3.5",
+  "uuid": "34aae9ff-9611-45af-911d-619bc2ec9640",
+  "type": "sprite",
+  "wrapMode": "clamp",
+  "filterMode": "bilinear",
+  "premultiplyAlpha": false,
+  "genMipmaps": false,
+  "packable": true,
+  "width": 1920,
+  "height": 1080,
+  "platformSettings": {},
+  "subMetas": {
+    "城市场景": {
+      "ver": "1.0.4",
+      "uuid": "545d115a-e5ef-4d17-b4e8-7645457ea862",
+      "rawTextureUuid": "34aae9ff-9611-45af-911d-619bc2ec9640",
+      "trimType": "auto",
+      "trimThreshold": 1,
+      "rotated": false,
+      "offsetX": 0,
+      "offsetY": 0,
+      "trimX": 0,
+      "trimY": 0,
+      "width": 1920,
+      "height": 1080,
+      "rawWidth": 1920,
+      "rawHeight": 1080,
+      "borderTop": 0,
+      "borderBottom": 0,
+      "borderLeft": 0,
+      "borderRight": 0,
+      "subMetas": {}
+    }
+  }
+}
