@@ -67,6 +67,4 @@ export default class NewClass extends EduElementAbstract {
         }
         cc.tween(_selfComp.result.node).to(1.5, {opacity: 0}).start();
     }
-
-    // update (dt) {}
 }
